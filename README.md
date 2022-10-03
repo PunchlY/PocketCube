@@ -249,6 +249,14 @@ $$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},
 
 此方法将返回新的`Rubik`实例, 新的`Rubik`的状态值将与原`Rubik`的状态值相同.
 
+#### Rubik.prototype.inverse()
+
+此方法将返回当前状态的逆.
+
+#### Rubik.prototype.image()
+
+此方法将返回当前状态的镜像.
+
 #### Rubik.prototype.action(...rubiks)
 
 执行旋转或复合旋转(状态).
@@ -328,6 +336,30 @@ new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F
 
 ### Turn
 
+#### Turn.prototype.copy()
+
+与[Rubik.prototype.copy()](#rubikprototypecopy)相同.
+
+此方法将返回新的`Rubik`实例.
+
+#### Turn.prototype.inverse()
+
+与[Rubik.prototype.inverse()](#rubikprototypeinverse)相同.
+
+此方法将返回新的`Rubik`实例.
+
+#### Turn.prototype.image()
+
+与[Rubik.prototype.image()](#rubikprototypeimage)相同.
+
+此方法将返回新的`Rubik`实例.
+
+#### Turn.prototype.action(...rubiks)
+
+与[Rubik.prototype.action()](#rubikprototypeactionrubiks)相同.
+
+此方法将返回新的`Rubik`实例.
+
 #### Turn.C
 为`Turn`实例的长度为`24`的数组, 其元素定义为魔方在空间中不同位置(朝向)的状态.
 
@@ -337,28 +369,28 @@ new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F
 本质为`Turn.C[0]`执行`"R"`(`"R2"`, `"R'"`)旋转后的状态.
 
 #### Turn.U
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 #### Turn.F
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 #### Turn.L
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 #### Turn.D
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 #### Turn.B
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 #### Turn.X
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 #### Turn.Y
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 #### Turn.Z
-类似[Turn.R](#Turn.R)
+类似[Turn.R](#turnr)
 
 ## License
 

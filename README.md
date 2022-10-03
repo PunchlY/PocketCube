@@ -129,15 +129,16 @@ $$X_0,Y_0,Z_0\in C\\
 用类似的方法定义`X`:
 
 $$X_0\in X$$
+
 $$\forall X_i,\exists X_j,X_k,X_i=X_jX_k$$
 
 等效的定义:
 
-$$\begin{aligned}
-X_1=2X_0=2{X_0}^{-1}\\
-X_2=3X_0={X_0}^{-1}\\
-X=\left\{X_0,X_1,X_2\right\}\\
-\end{aligned}$$
+$$X_1=2X_0=2{X_0}^{-1}$$
+
+$$X_2=3X_0={X_0}^{-1}$$
+
+$$X=\left\{X_0,X_1,X_2\right\}$$
 
 `Y` `Z`类似.
 
@@ -186,12 +187,17 @@ $$\forall U_i\in U,\forall R_i\in R,U_i=X_0R_i{X_0}^{-1}$$
 
 定义:
 
-$$\overline{X_0}=X_0\\
-\overline{Y_0}={Y_0}^{-1}\\
-\overline{Z_0}={Z_0}^{-1}\\
-\overline{R_0}={L_0}^{-1}\\
-\overline{U_0}={D_0}^{-1}\\
-\overline{F_0}={B_0}^{-1}$$
+$$\overline{X_0}=X_0$$
+
+$$\overline{Y_0}={Y_0}^{-1}$$
+
+$$\overline{Z_0}={Z_0}^{-1}$$
+
+$$\overline{R_0}={L_0}^{-1}$$
+
+$$\overline{U_0}={D_0}^{-1}$$
+
+$$\overline{F_0}={B_0}^{-1}$$
 
 复合的镜像:
 

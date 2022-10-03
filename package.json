@@ -1,19 +1,19 @@
 {
-  "name": "pocketrubik",
+  "name": "pocketcube",
   "version": "1.0.3",
-  "description": "一个解二阶魔方的api(An api for Pocket Rubik).",
+  "description": "一个解二阶魔方的api(An api for Pocket Cube).",
   "main": "index.js",
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git://github.com/PunchlY/PocketRubik.git"
+    "url": "git://github.com/PunchlY/PocketCube.git"
   },
   "author": "punchly <punchly@foxmail.com>",
   "license": "WTFPL",
   "bugs": {
-    "url": "https://github.com/PunchlY/PocketRubik/issues"
+    "url": "https://github.com/PunchlY/PocketCube/issues"
   },
-  "homepage": "https://github.com/PunchlY/PocketRubik#readme",
+  "homepage": "https://github.com/PunchlY/PocketCube#readme",
   "keywords": [
     "rubik",
     "cube",

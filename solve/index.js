@@ -24,9 +24,10 @@ const RT = [
     M[3], M[9], M[6],
     M[13], M[15], M[4],
 ];
-
-class Rubik extends require('../index') {
-    static basisSolutionList = require('./solve.json')
+const _Rubik = require('../index');
+const basisSolutionList = require('./solve.json')
+class Rubik extends _Rubik {
+    static basisSolutionList = basisSolutionList;
     solve(t = NaN) {
         const raw = (() => {
             const call = {};
@@ -53,6 +54,17 @@ class Rubik extends require('../index') {
         }, M[0]);
         return raw.map((v) => Re[v]).join('');
     }
+    static get [Symbol.species]() {
+        return this;
+    }
 }
+Rubik.prototype.constructor = Rubik;
+class Turn extends _Rubik.Turn {
+    static get [Symbol.species]() {
+        return Rubik;
+    }
+}
+Turn.prototype.constructor = Turn;
+Rubik.Turn = Turn;
 
 module.exports = Rubik;

@@ -65,6 +65,7 @@ class Turn extends _Rubik.Turn {
     }
 }
 Turn.prototype.constructor = Turn;
+Rubik.Rubik = Rubik;
 Rubik.Turn = Turn;
 
 module.exports = Rubik;

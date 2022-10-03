@@ -9,7 +9,7 @@
     "type": "git",
     "url": "git://github.com/PunchlY/PocketRubik.git"
   },
-  "author": "PunchlY",
+  "author": "punchly <punchly@foxmail.com>",
   "license": "WTFPL",
   "bugs": {
     "url": "https://github.com/PunchlY/PocketRubik/issues"

@@ -119,8 +119,8 @@ C1.forEach((n, i) => {
 
 存在集合`C`, 满足:
 
-$$X_0,Y_0,Z_0\in C\\
-\forall C_i,\exists C_j,C_k,C_i=C_jC_k$$
+$$X_0,Y_0,Z_0\in\mathbf{C}\\
+\forall C_i\in\mathbf{C},\exists C_j,C_k\in\mathbf{C},C_i=C_jC_k$$
 
 `C`中所有元素被称为基本状态.
 
@@ -128,9 +128,9 @@ $$X_0,Y_0,Z_0\in C\\
 
 用类似的方法定义`X`:
 
-$$X_0\in X$$
+$$X_0\in\mathbf{X}$$
 
-$$\forall X_i,\exists X_j,X_k,X_i=X_jX_k$$
+$$\forall X_i\in\mathbf{X},\exists X_j,X_k\in\mathbf{X},X_i=X_jX_k$$
 
 等效的定义:
 
@@ -138,7 +138,7 @@ $$X_1=2X_0=2{X_0}^{-1}$$
 
 $$X_2=3X_0={X_0}^{-1}$$
 
-$$X=\{ X_0,X_1,X_2\} $$
+$$\mathbf{X}=\{X_0,X_1,X_2\}$$
 
 `Y` `Z`类似.
 
@@ -168,11 +168,11 @@ $$\left(P^{-1}\right)^{-1}=P$$
 
 定义`L`:
 
-$$\forall L_i\in L,\forall R_i\in R,L_i=X_0R_i{X_0}^{-1}$$
+$$\forall L_i\in\mathbf{L},\forall R_i\in\mathbf{R},L_i=X_0R_i{X_0}^{-1}$$
 
 定义`U`:
 
-$$\forall U_i\in U,\forall R_i\in R,U_i=X_0R_i{X_0}^{-1}$$
+$$\forall U_i\in\mathbf{U},\forall R_i\in\mathbf{R},U_i=X_0R_i{X_0}^{-1}$$
 
 定义`F` `B` `D`:
 ...

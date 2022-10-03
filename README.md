@@ -145,7 +145,7 @@ $$\mathbf{X}=\begin{Bmatrix}X_0,X_1,X_2\end{Bmatrix}$$
 
 ### 逆
 
-`P` `Q`两个魔方若满足以下:
+`P` `Q`若满足以下:
 
 $$PQ=C_0$$
 
@@ -196,10 +196,6 @@ $$\overline{Z_0}={Z_0}^{-1}$$
 
 $$\overline{R_0}={L_0}^{-1}$$
 
-$$\overline{U_0}={D_0}^{-1}$$
-
-$$\overline{F_0}={B_0}^{-1}$$
-
 复合的镜像:
 
 $$\overline{PQ}=\overline{P}\ \overline{Q}$$
@@ -208,8 +204,40 @@ $$\overline{PQ}=\overline{P}\ \overline{Q}$$
 
 $$\overline{\overline{P}}=P$$
 
+逆的镜像:
+
+$$\overline{P^{-1}}=\overline{P}^{-1}$$
+
 
 ### 相似&全等
+
+#### 相似
+
+`P` `Q`若满足以下:
+
+$$\exists C_i,C_j\in\mathbf{C},P=C_iQC_j$$
+
+则表示`P`全等于`Q`.
+
+#### 全等
+
+`P` `Q`若满足以下:
+
+$$\exists C_i,C_j\in\mathbf{C},P=C_iQC_j$$
+
+或
+
+$$\exists C_i,C_j\in\mathbf{C},P^{-1}=C_iQC_j$$
+
+或
+
+$$\exists C_i,C_j\in\mathbf{C},\overline{P}=C_iQC_j$$
+
+或
+
+$$\exists C_i,C_j\in\mathbf{C},\overline{P^{-1}}=C_iQC_j$$
+
+则表示`P`相似于`Q`.
 
 ## api
 
@@ -274,6 +302,10 @@ new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0); // F'RFU'F2UFR2U'
 new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(-1); // B'DBD'L2DBD2L'
 new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F'
 ```
+
+`t`默认为`NaN`.
+
+`t`为整数时, 按位以`0`: [`R` `U` `F`], `1`: [`L` `D` `B`], 分配公式字母.
 
 ### Turn
 

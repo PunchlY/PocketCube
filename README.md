@@ -1,5 +1,7 @@
 # PocketRubik
 
+一个解二阶魔方的api(An api for Pocket Rubik).
+
 ## 快速开始
 
 ```
@@ -211,7 +213,7 @@ $$\overline{P^{-1}}=\overline{P}^{-1}$$
 
 ### 相似&全等
 
-#### 相似
+#### 全等
 
 `P` `Q`若满足以下:
 
@@ -219,23 +221,11 @@ $$\exists C_i,C_j\in\mathbf{C},P=C_iQC_j$$
 
 则表示`P`全等于`Q`.
 
-#### 全等
+#### 相似
 
 `P` `Q`若满足以下:
 
-$$\exists C_i,C_j\in\mathbf{C},P=C_iQC_j$$
-
-或
-
-$$\exists C_i,C_j\in\mathbf{C},P^{-1}=C_iQC_j$$
-
-或
-
-$$\exists C_i,C_j\in\mathbf{C},\overline{P}=C_iQC_j$$
-
-或
-
-$$\exists C_i,C_j\in\mathbf{C},\overline{P^{-1}}=C_iQC_j$$
+$$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},\overline{P^{-1}}\end{Bmatrix},R=C_iQC_j$$
 
 则表示`P`相似于`Q`.
 
@@ -289,6 +279,35 @@ rubik.do(`R'`).do(`F2'`);
 new Rubik().do(`R'`).isReinstated(); // false
 new Rubik().do(Turn.C[10]).isReinstated(); // true
 ```
+
+#### Rubik.prototype.at(i)
+
+获取位置`i`的值, 与编号和旋转量有关.
+
+```js
+C[i] * 3 + T[i];
+```
+
+#### Rubik.prototype.similar(n, i)
+
+返回值为一个`Generator`, 生成相似于当前状态(`S`)的状态.
+
+$$\begin{Bmatrix}C_iTC_j\ |\ T\in\begin{Bmatrix}S,S^{-1},\overline{S},\overline{S^{-1}}\end{Bmatrix}\end{Bmatrix}$$
+
+```js
+const rubik = new Rubik(/* ... */);
+for (const { r, c: [c, cT], image, inverse } of rubik.similar(0)) {
+    // ...
+}
+```
+
+若设置`n` `i`, 则只输出位置`i`上值为`n`的状态, `i`默认为`0`.
+
+#### Rubik.prototype.congruent(n, i)
+
+返回值为一个`Generator`, 生成全等于当前状态(`S`)的状态.
+
+$$\begin{Bmatrix}C_iSC_j\end{Bmatrix}$$
 
 #### Rubik.prototype.solve(t)
 

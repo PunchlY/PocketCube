@@ -119,8 +119,9 @@ C1.forEach((n, i) => {
 
 存在集合`C`, 满足:
 
-$$X_0,Y_0,Z_0\in\mathbf{C}\\
-\forall C_i\in\mathbf{C},\exists C_j,C_k\in\mathbf{C},C_i=C_jC_k$$
+$$X_0,Y_0,Z_0\in\mathbf{C}$$
+
+$$\forall C_i\in\mathbf{C},\exists C_j,C_k\in\mathbf{C},C_i=C_jC_k$$
 
 `C`中所有元素被称为基本状态.
 
@@ -138,7 +139,7 @@ $$X_1=2X_0=2{X_0}^{-1}$$
 
 $$X_2=3X_0={X_0}^{-1}$$
 
-$$\mathbf{X}=\{X_0,X_1,X_2\}$$
+$$\mathbf{X}=\begin{Bmatrix}X_0,X_1,X_2\end{Bmatrix}$$
 
 `Y` `Z`类似.
 

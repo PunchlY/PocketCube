@@ -1,0 +1,18 @@
+{
+  "name": "pocketrubik",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PunchlY/PocketRubik.git"
+  },
+  "author": "PunchlY",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/PunchlY/PocketRubik/issues"
+  },
+  "homepage": "https://github.com/PunchlY/PocketRubik#readme"
+}

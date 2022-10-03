@@ -20,7 +20,7 @@ rubik.do(`RF2U'`);
 解魔方:
 
 ```js
-const Rubik = require('pocketcube/dist/PocketCube_solve');
+const Rubik = require('pocketcube/solve');
 
 const rubik = new Rubik();
 rubik.do(`RF2U'B2LBD2L'`);
@@ -33,7 +33,7 @@ new Rubik().do(`D2RF'U2B'`).solve(0); // FR2FU'F2
 
 ### 状态
 
-见[Wikipedia/Pocket_Cube#Permutations](https://en.wikipedia.org/wiki/Pocket_Cube#Permutations).
+见[Wikipedia/Pocket_Cube#Permutations](https://en.wikipedia.org/wiki/Pocket_Cube#Permutations)(zh:[Wikipedia/Pocket_Cube#Permutations](https://en.wikipedia.org/wiki/Pocket_Cube#Permutations)).
 
 > `8`个角块的位置均可进行任意互换(`8!`种状态), 如果以一个角块不动作为参考角块, 其他`7`个角块都能任意转换方向(即`37`种状态)(注: 这里指的转换方向, 或者说翻转, 是指一个角块从例如`白-红-绿`变成`绿-白-红`但是一次翻转一定会翻转到`3`个角块). 如果在空间中旋转则不计算方向不同而状态相同的魔方, 实际上的准确状态数还应除以`8`. 所以二阶魔方的总状态数为:
 >

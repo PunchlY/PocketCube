@@ -1,4 +1,4 @@
-# PocketRubik
+# PocketCube
 
 一个解二阶魔方的api(An api for Pocket Rubik).
 

@@ -33,7 +33,7 @@ new Rubik().do(`D2RF'U2B'`).solve(0); // FR2FU'F2
 
 ### 状态
 
-见[Wikipedia/Pocket_Cube#Permutations](https://en.wikipedia.org/wiki/Pocket_Cube#Permutations)(zh:[Wikipedia/Pocket_Cube#Permutations](https://en.wikipedia.org/wiki/Pocket_Cube#Permutations)).
+见[Wikipedia/Pocket_Cube#Permutations](https://en.wikipedia.org/wiki/Pocket_Cube#Permutations)(zh:[维基百科/二阶魔方#变化](https://zh.wikipedia.org/wiki/%E4%BA%8C%E9%98%B6%E9%AD%94%E6%96%B9#%E5%8F%98%E5%8C%96)).
 
 > `8`个角块的位置均可进行任意互换(`8!`种状态), 如果以一个角块不动作为参考角块, 其他`7`个角块都能任意转换方向(即`37`种状态)(注: 这里指的转换方向, 或者说翻转, 是指一个角块从例如`白-红-绿`变成`绿-白-红`但是一次翻转一定会翻转到`3`个角块). 如果在空间中旋转则不计算方向不同而状态相同的魔方, 实际上的准确状态数还应除以`8`. 所以二阶魔方的总状态数为:
 >
@@ -43,11 +43,11 @@ new Rubik().do(`D2RF'U2B'`).solve(0); // FR2FU'F2
 
 即总状态数为: 
 
-$${8!\ 3^7}=88,179,840$$
+$${8!\,3^7}=88,179,840$$
 
 ### 状态数(position)
 
-为了给所有状态一个固定的"`id`", 这里定义了`8`个角块的位置与`8`个角块的旋转的排列(状态)到状态数的映射: 
+为了给所有状态一个固定的"`id`", 这里定义了`8`个角块的位置与`8`个角块的旋转的排列(状态)到状态数的映射.
 
 #### 定义
 
@@ -133,9 +133,9 @@ $$X_0\in X\\
 
 等效的定义:
 
-$$X_1=2X_0\\
-X_2=3X_0\\
-X=\{X_0,X_1,X_2\}$$
+$$X_1=2X_0=2{X_0}^{-1}\\
+X_2=3X_0={X_0}^{-1}\\
+X=\left\{X_0,X_1,X_2\right\}$$
 
 `Y` `Z`类似.
 
@@ -151,7 +151,11 @@ $$P=Q^{-1}\Leftrightarrow P^{-1}=Q$$
 
 复合的逆:
 
-$$(PQ)^{-1}=Q^{-1}P^{-1}$$
+$$\left(PQ\right)^{-1}=Q^{-1}P^{-1}$$
+
+逆的逆:
+
+$$\left(P^{-1}\right)^{-1}=P$$
 
 ### 基本旋转
 
@@ -161,11 +165,11 @@ $$(PQ)^{-1}=Q^{-1}P^{-1}$$
 
 定义`L`:
 
-$$\forall L_i\in L,\forall R_i\in R,L_i=X_0R_iX_0^{-1}$$
+$$\forall L_i\in L,\forall R_i\in R,L_i=X_0R_i{X_0}^{-1}$$
 
 定义`U`:
 
-$$\forall U_i\in U,\forall R_i\in R,U_i=X_0R_iX_0^{-1}$$
+$$\forall U_i\in U,\forall R_i\in R,U_i=X_0R_i{X_0}^{-1}$$
 
 定义`F` `B` `D`:
 ...
@@ -180,9 +184,20 @@ $$\forall U_i\in U,\forall R_i\in R,U_i=X_0R_iX_0^{-1}$$
 
 定义:
 
-$\overline{X}=X$
+$$\overline{X_0}=X_0\\
+\overline{Y_0}={Y_0}^{-1}\\
+\overline{Z_0}={Z_0}^{-1}\\
+\overline{R_0}={L_0}^{-1}\\
+\overline{U_0}={D_0}^{-1}\\
+\overline{F_0}={B_0}^{-1}$$
 
-$\overline{Y}=Y^{-1}$
+复合的镜像:
+
+$$\overline{PQ}=\overline{P}\ \overline{Q}$$
+
+镜像的镜像:
+
+$$\overline{\overline{P}}=P$$
 
 
 ### 相似&全等

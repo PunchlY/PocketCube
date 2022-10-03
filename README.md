@@ -132,10 +132,11 @@ $$X_0\in X\\
 \forall X_i,\exists X_j,X_k,X_i=X_jX_k$$
 
 等效的定义:
-
-$$X_1=2X_0=2{X_0}^{-1}\\
+$$\begin{aligned}
+X_1=2X_0=2{X_0}^{-1}\\
 X_2=3X_0={X_0}^{-1}\\
-X=\left\\{X_0,X_1,X_2\right\\}$$
+X=\left\{X_0,X_1,X_2\right\}\\
+\end{aligned}$$
 
 `Y` `Z`类似.
 

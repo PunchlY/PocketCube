@@ -212,12 +212,12 @@ class Rubik extends BaseRubik {
         }(`${scr}`.replace(/\s/g, '').split(''), Turn));
     }
 
-    static basisSolutionList = require('./solve.json');
+    static #basisSolutionList = require('./solve.json');
     solve(t = NaN) {
         const raw = (() => {
             const call = {};
             for (const { r, c: [c, cT], image, inverse } of this.similar(0)) {
-                const e = this.constructor.basisSolutionList[r.position];
+                const e = this.constructor.#basisSolutionList[r.position];
                 if (e === undefined) continue;
                 let E = [].concat(e.split('')).map((v) => ~~v);
                 image && (E = E.map((v) => (~~(v / 3) || 3) * 3 + (2 - v % 3)));

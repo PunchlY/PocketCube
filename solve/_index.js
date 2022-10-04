@@ -49,12 +49,12 @@ class Turn extends _Rubik.Turn {
     static B = [4540624, 5469687, 929887].map((g) => new this(g));
 }
 class Rubik extends _Rubik {
-    static basisSolutionList = basisSolutionList;
+    static #basisSolutionList = basisSolutionList;
     solve(t = NaN) {
         const raw = (() => {
             const call = {};
             for (const { r, c: [c, cT], image, inverse } of this.similar(0)) {
-                const e = this.constructor.basisSolutionList[r.position];
+                const e = this.constructor.#basisSolutionList[r.position];
                 if (e === undefined) continue;
                 let E = [].concat(e.split('')).map((v) => ~~v);
                 image && (E = E.map((v) => (~~(v / 3) || 3) * 3 + (2 - v % 3)));

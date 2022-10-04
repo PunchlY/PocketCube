@@ -1,4 +1,4 @@
-const { Rubik, Turn } = require('../index');
+const { Rubik, Turn } = require('../');
 
 function solve(e, eT, max = Infinity) {
     return function* () {

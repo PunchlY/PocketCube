@@ -1,8 +1,8 @@
-const create = require('./solve').halfOrQuarter;
+import { solve } from '../build/index.js';
 
 let n = 0, l = 0;
 const json = {};
-for (const { position, build } of create()) {
+for await (const { position, build } of solve.halfOrQuarter()) {
     json[position] = build;
     n++, l = build.length > l ? (console.log(l), build.length) : l;
 }
@@ -10,5 +10,7 @@ for (const { position, build } of create()) {
 console.log('size:', n);
 console.log('length:', l);
 
-const fs = require('fs');
-fs.writeFileSync(__dirname + '/solve.json', JSON.stringify(json));
+import { writeFileSync } from 'fs';
+
+const data = JSON.stringify(json);
+writeFileSync(`${process.cwd()}/src/solvedata.json`, data);

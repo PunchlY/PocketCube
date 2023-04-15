@@ -13,4 +13,4 @@ console.log('length:', l);
 import { writeFileSync } from 'fs';
 
 const data = JSON.stringify(json);
-writeFileSync(`${process.cwd()}/src/solvedata.json`, data);
+writeFileSync(`${process.cwd()}/build/solvedata.json`, data);

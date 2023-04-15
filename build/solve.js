@@ -52,8 +52,8 @@ const transform = (raw, t = NaN) => {
             v = this[~~(v / 3)] * 3 + v % 3;
             raw[i] = b * 9 + v % 9;
             if (b ^ ~~(v / 9))
-                RT[v].map((_, i, a) => this[i] = a[this[i]]);
-        }, M[0]);
+                RT[v].map((v, i, a) => this[i] = a[this[i]]);
+        }, [...M[0]]);
     return raw.map((v) => Re[v]).join('');
 };
 export class SolveRubik extends Rubik {

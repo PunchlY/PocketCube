@@ -261,7 +261,7 @@ export var solve;
                 for (const { r } of _r.congruent(0))
                     set.add(r.position);
                 eT.filter((n) => !build.length || ~~((build.at(-1) - n) / 3)).forEach((n) => _map.set(_r.copy().action(turn[n]), [...build, n]));
-                eT.filter((n) => !build.length || ~~((build.at(0) - n) / 3)).forEach((n) => _map.set(_r.copy().action(turn[n]), [n, ...build]));
+                eT.filter((n) => !build.length || ~~((build.at(0) - n) / 3)).forEach((n) => _map.set(turn[n].action(_r), [n, ...build]));
             }
             map = _map, _map = new Map(), l++;
         }

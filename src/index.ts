@@ -280,7 +280,7 @@ export namespace solve {
                     [...build, n],
                 ));
                 eT.filter((n) => !build.length || ~~((build.at(0) - n) / 3)).forEach((n) => _map.set(
-                    _r.copy().action(turn[n]),
+                    turn[n].action(_r),
                     [n, ...build],
                 ));
             }

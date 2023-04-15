@@ -1,5 +1,5 @@
 
-const chs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/~!@#$%^&*()-_ ?[]{}:;<>,."`|';
+const chs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/~!@#%^&*()-_ ?[]{}:;<>,."|`$';
 const { length } = chs;
 const mlength = Math.ceil(Math.log(88179840) / Math.log(length));
 

@@ -1,8 +1,8 @@
-import { solve } from '../build/index.js';
+import { Solve } from '../build/index.js';
 
 let n = 0, l = 0;
 const json = {};
-for await (const { position, build } of solve.halfOrQuarter()) {
+for await (const { position, build } of Solve.halfOrQuarter()) {
     json[position] = build;
     n++, l = build.length > l ? (console.log(l), build.length) : l;
 }

@@ -1,6 +1,7 @@
 type L = [number, number, number, number, number, number, number, number];
 const copy = (...ls: L[]) => ls.map((v) => [].concat(v) as L);
 const CTMap = new WeakMap<BaseRubik, [L, L]>();
+const iterator8 = [...Array(8).keys()];
 function CTToPosition([C, T]: [L, L]) {
     const list = [8];
     return T.slice(0, -1).reduceRight((p, c) => p * 3 + c, C.reduceRight((p, c, i) => {
@@ -18,10 +19,10 @@ function positionToCT(position: number, rubik: BaseRubik) {
         position = ~~(position / 3);
         return p + c;
     }, 0) % 3) % 3);
-    Array.from({ length: 8 }).forEach(function (this: number[], _, i) {
+    iterator8.forEach(function (this: number[], i) {
         C.push(this.splice(position % (8 - i), 1)[0]);
         position = ~~(position / (8 - i));
-    }, Array.from({ length: 8 }).map((v, i) => i));
+    }, [...iterator8]);
     rubik && CTMap.set(rubik, [C, T]);
 }
 function copyRubik(rubik: BaseRubik, constructor = Rubik) {
@@ -30,7 +31,7 @@ function copyRubik(rubik: BaseRubik, constructor = Rubik) {
     CTMap.set(copy, [[].concat(C) as L, [].concat(T) as L]);
     return copy;
 }
-const action = <T extends BaseRubik>(self: T, ...rubiks: BaseRubik[]) => {
+const action = <T extends BaseRubik>(self: T, rubiks: Iterable<BaseRubik>) => {
     const [C, T] = CTMap.get(self);
     for (const rubik of rubiks) {
         const [tC, tT] = copy(C, T);
@@ -86,7 +87,7 @@ Object.defineProperties(BaseRubik.prototype, Object.assign({
     },
     length: { value: 8 },
     [Symbol.isConcatSpreadable]: { value: true },
-}, Array.from({ length: 8 }).map((v, i) => ({
+}, iterator8.map((i) => ({
     get(this: BaseRubik) {
         const [C, T] = CTMap.get(this);
         return C[i] * 3 + T[i];
@@ -134,11 +135,10 @@ export namespace Turn {
         40288914, 53569564, 84835823,
         73463517, 71102743, 86465138,
     ].map($Turn)) as C;
-    export const _C = freeze(
-        Array.from({ length: 8 })
-            .map((_, i) => Turn.C.slice().sort((c1, c2) => c1[i] - c2[i]))
-            .map(freeze)
-    ) as _C;
+
+    export const _C = freeze(iterator8.map(
+        (i) => freeze([...Turn.C].sort((c1, c2) => c1[i] - c2[i]))
+    )) as _C;
 
     export const X = freeze([C[14], C[18], C[8]] as const);
     export const Y = freeze([C[6], C[9], C[3]] as const);
@@ -151,6 +151,29 @@ export namespace Turn {
     export const D = freeze([37179, 164025, 126846].map($Turn)) as Turns;
     export const B = freeze([4540624, 5469687, 929887].map($Turn)) as Turns;
 }
+
+const similar = ((CT) => function* (rubik: Rubik, set: Set<number>, n?: number, i?: number) {
+    for (const c of Turn.C) {
+        const _r = c.action(rubik);
+        for (const cT of CT(_r, n, i)) {
+            const r = _r.copy().action(cT);
+            const { position } = r;
+            if (set.has(position)) continue;
+            set.add(position);
+            yield { r, c: [c, cT] as const };
+        }
+    }
+})(function* (rubik: Rubik, n?: number, i = 0) {
+    if (n === null || isNaN(n)) for (const cT of Turn.C) yield cT;
+    else yield Turn._C[i][rubik.find(n)];
+});
+
+const TurnParse = ((table, aregexp, gRegexp) => function* (scr: string) {
+    scr = scr.replace(/\s/g, '');
+    if (!aregexp.test(scr)) return false;
+    for (const [, t, p] of scr.matchAll(gRegexp))
+        yield Turn[t][table[p]] as Readonly<Turn>;
+})({ '': 0, 2: 1, '\'': 2 }, /^([RUFLDBXYZ](2|'|))*$/, /([RUFLDBXYZ])(2|'|)/g);
 
 export class Rubik extends BaseRubik {
     static get [Symbol.species]() {
@@ -166,7 +189,7 @@ export class Rubik extends BaseRubik {
         return copyRubik(this, this.constructor[Symbol.species]);
     }
     action(...rubiks: BaseRubik[]) {
-        return action(this, ...rubiks);
+        return action(this, rubiks);
     }
     inverse() {
         const [C, T] = CTMap.get(this);
@@ -200,67 +223,36 @@ export class Rubik extends BaseRubik {
         ][super[0]] === super.position;
     }
 
-    *similar(n = NaN, i = 0) {
-        const set = new Set();
-        for (const [t, self] of [this, copyRubik(this).image(), copyRubik(this).inverse(), copyRubik(this).image().inverse()].entries()) if (!set.has(self.position)) for (const c of Turn.C) {
-            const _r = c.action(self);
-            for (const cT of function* () {
-                if (n === null || isNaN(n)) for (const cT of Turn.C) yield cT;
-                else yield Turn._C[i][_r.find(n)];
-            }()) {
-                const r = _r.copy().action(cT);
-                const genotype = r.position;
-                if (set.has(genotype)) continue;
-                set.add(genotype);
-                yield { r, c: [c, cT], image: !!(t & 1), inverse: !!(t & 2) };
-            }
+    *similar(n?: number, i?: number) {
+        const set = new Set<number>();
+        for (const [t, self] of [this, copyRubik(this).image(), copyRubik(this).inverse(), copyRubik(this).image().inverse()].entries()) {
+            if (set.has(self.position)) continue;
+            for (const s of similar(self, set, n, i))
+                yield { ...s, image: !!(t & 1), inverse: !!(t & 2) };
         }
     }
-    *congruent(n = NaN, i = 0) {
-        const set = new Set();
-        for (const c of Turn.C) {
-            const _r = c.action(this);
-            for (const cT of function* () {
-                if (n === null || isNaN(n)) for (const cT of Turn.C) yield cT;
-                else yield Turn._C[i][_r.find(n)];
-            }()) {
-                const r = _r.copy().action(cT);
-                const genotype = r.position;
-                if (set.has(genotype)) continue;
-                set.add(genotype);
-                yield { r, c: [c, cT], image: false, inverse: false };
-            }
-        }
+    *congruent(n?: number, i?: number) {
+        for (const s of similar(this, new Set(), n, i))
+            yield { ...s, image: false, inverse: false };
     }
-    *similarNoCongruence(n = NaN, i = 0) {
-        const set = new Set();
-        for (const [t, self] of [, copyRubik(this).image(), copyRubik(this).inverse(), copyRubik(this).image().inverse()].entries()) if (self && !set.has(self.position)) for (const c of Turn.C) {
-            const _r = c.action(self);
-            for (const cT of function* () {
-                if (n === null || isNaN(n)) for (const cT of Turn.C) yield cT;
-                else yield Turn._C[i][_r.find(n)];
-            }()) {
-                const r = _r.copy().action(cT);
-                const genotype = r.position;
-                if (set.has(genotype)) continue;
-                set.add(genotype);
-                yield { r, c: [c, cT], image: !!(t & 1), inverse: !!(t & 2) };
-            }
+    *similarNoCongruence(n?: number, i?: number) {
+        const set = new Set<number>();
+        for (const [t, self] of [, copyRubik(this).image(), copyRubik(this).inverse(), copyRubik(this).image().inverse()].entries()) {
+            if (!self || set.has(self.position)) continue;
+            for (const s of similar(self, set, n, i))
+                yield { ...s, image: !!(t & 1), inverse: !!(t & 2) };
         }
     }
 
     do(scr: string) {
-        scr = scr.replace(/\s/g, '');
-        if (!/^([RUFLDBXYZ](2|'|))*$/.test(scr)) return false;
         return action(
             this,
-            ...[...scr.matchAll(/([RUFLDBXYZ])(2|'|)/g)
-            ].map(([, t, p]) => Turn[t][{ '': 0, 2: 1, '\'': 2 }[p]]),
+            TurnParse(scr),
         );
     }
 }
 
-export namespace solve {
+export namespace Solve {
     const turn = [...Turn.R, ...Turn.U, ...Turn.F] as const;
     const solve = (eT: number[], max = Infinity) => async function* () {
         const set = new Set();
@@ -269,11 +261,20 @@ export namespace solve {
             for (const [_r, build] of map) {
                 const { position } = _r;
                 if (set.has(position)) continue;
+                const min = {
+                    position,
+                    build,
+                };
                 if ((() => {
-                    for (const { r: { position } } of _r.similarNoCongruence(0))
+                    for (const data of _r.similarNoCongruence(0)) {
+                        const { r: { position } } = data;
                         if (set.has(position)) return false;
+                        if (position > min.position) continue;
+                        min.position = position;
+                        min.build = transform(build, data, 0);
+                    }
                     return true;
-                })()) yield { position, build };
+                })()) yield min;
                 for (const { r } of _r.congruent(0)) set.add(r.position);
                 eT.filter((n) => !build.length || ~~((build.at(-1) - n) / 3)).forEach((n) => _map.set(
                     _r.copy().action(turn[n]),
@@ -298,4 +299,65 @@ export namespace solve {
         3, 5,
         6, 8,
     ], 14);
+
+
+    const Re = [
+        'R', 'R2', 'R\'',
+        'U', 'U2', 'U\'',
+        'F', 'F2', 'F\'',
+        'L', 'L2', 'L\'',
+        'D', 'D2', 'D\'',
+        'B', 'B2', 'B\'',
+    ] as const;
+    const M = [
+        [0, 1, 2, 3, 4, 5], [1, 2, 0, 4, 5, 3], [2, 0, 1, 5, 3, 4],
+        [2, 1, 3, 5, 4, 0], [1, 3, 2, 4, 0, 5], [3, 2, 1, 0, 5, 4],
+        [5, 1, 0, 2, 4, 3], [1, 0, 5, 4, 3, 2], [0, 5, 1, 3, 2, 4],
+        [3, 1, 5, 0, 4, 2], [1, 5, 3, 4, 2, 0], [5, 3, 1, 2, 0, 4],
+        [2, 4, 0, 5, 1, 3], [4, 0, 2, 1, 3, 5], [0, 2, 4, 3, 5, 1],
+        [3, 4, 2, 0, 1, 5], [4, 2, 3, 1, 5, 0], [2, 3, 4, 5, 0, 1],
+        [0, 4, 5, 3, 1, 2], [4, 5, 0, 1, 2, 3], [5, 0, 4, 2, 3, 1],
+        [5, 4, 3, 2, 1, 0], [4, 3, 5, 1, 0, 2], [3, 5, 4, 0, 2, 1],
+    ] as const;
+    const RM = [
+        M[14], M[18], M[8],
+        M[6], M[9], M[3],
+        M[4], M[15], M[13],
+        M[8], M[18], M[14],
+        M[3], M[9], M[6],
+        M[13], M[15], M[4],
+    ] as const;
+
+    const transformC = ((fn) => (raw: number[], cT?: Readonly<Turn>) =>
+        cT ? raw.map(fn, M[cT[0]]) : raw
+    )(function (this: number[], v: number) {
+        return this[~~(v / 3)] * 3 + v % 3;
+    });
+    const transformB = (raw: number[], t = NaN) => (t === null || isNaN(t)) ?
+        raw :
+        raw.map(function (this: number[], v) {
+            const b = t & 1; t >>= 1;
+            v = this[~~(v / 3)] * 3 + v % 3;
+            if (b ^ ~~(v / 9))
+                this.map(((a) => (v, i) => this[i] = a[v])(RM[v]));
+            return b * 9 + v % 9;
+        }, [0, 1, 2, 3, 4, 5]);
+
+    export const transform = (raw: number[], {
+        image,
+        inverse,
+        c: [c, cT],
+    }: {
+        image: boolean;
+        inverse: boolean;
+        c: readonly [Readonly<Turn>, Readonly<Turn>];
+    }, t = NaN) => {
+        if (image)
+            raw = raw.map((v) => (~~(v / 3) || 3) * 3 + (2 - v % 3));
+        if (inverse)
+            raw = raw.reverse().map((v) => ~~(v / 3) * 3 + (2 - v % 3));
+        return transformB(transformC(raw, ((c) => image ? c.image() : c)(inverse ? cT : c.inverse())), t);
+    };
+    export const stringify = (raw: number[], t = NaN) => transformB(raw, t).map((v) => Re[v]).join('');
+
 }

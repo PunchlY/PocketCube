@@ -1,2 +1,2 @@
-declare const json: Record<number, number[]>;
+declare const json: Record<number,readonly number[]>;
 export default json;

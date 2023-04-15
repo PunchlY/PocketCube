@@ -53,26 +53,26 @@ export declare class Rubik extends BaseRubik {
     image(): this;
     isReinstated(): boolean;
     similar(n?: number, i?: number): Generator<{
-        r: Rubik;
-        c: Readonly<Turn>[];
         image: boolean;
         inverse: boolean;
+        r: Rubik;
+        c: readonly [Readonly<Turn>, Readonly<Turn>];
     }, void, unknown>;
     congruent(n?: number, i?: number): Generator<{
-        r: Rubik;
-        c: Readonly<Turn>[];
         image: boolean;
         inverse: boolean;
+        r: Rubik;
+        c: readonly [Readonly<Turn>, Readonly<Turn>];
     }, void, unknown>;
     similarNoCongruence(n?: number, i?: number): Generator<{
-        r: Rubik;
-        c: Readonly<Turn>[];
         image: boolean;
         inverse: boolean;
+        r: Rubik;
+        c: readonly [Readonly<Turn>, Readonly<Turn>];
     }, void, unknown>;
-    do(scr: string): false | this;
+    do(scr: string): this;
 }
-export declare namespace solve {
+export declare namespace Solve {
     const halfOrQuarter: () => AsyncGenerator<{
         position: number;
         build: number[];
@@ -81,4 +81,10 @@ export declare namespace solve {
         position: number;
         build: number[];
     }, void, unknown>;
+    const transform: (raw: number[], { image, inverse, c: [c, cT], }: {
+        image: boolean;
+        inverse: boolean;
+        c: readonly [Readonly<Turn>, Readonly<Turn>];
+    }, t?: number) => number[];
+    const stringify: (raw: number[], t?: number) => string;
 }

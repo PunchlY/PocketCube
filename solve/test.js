@@ -1,4 +1,4 @@
-import { SolveRubik } from '../dist/PocketCube.solve.min.mjs';
+import { Rubik } from '../dist/PocketCube.solve.min.mjs';
 
-for (const solv of SolveRubik.solveAll('RUFR2U', true))
+for (const solv of Rubik.solveAll('RUFR2U', true))
     console.log(solv);

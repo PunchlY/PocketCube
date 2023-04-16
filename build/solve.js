@@ -26,13 +26,14 @@ export class SolveRubik extends Rubik {
         return stringify($solve(rubik), t);
     }
     SolveRubik.solve = solve;
-    function* solveAll(scr) {
+    function* solveAll(scr, reverse = false) {
         const rubik = new Rubik(0).do(scr);
         if (!rubik)
             return false;
         const solve = $solve(rubik);
-        for (let t = 0; t < 1 << solve.length; t++)
-            yield stringify(solve, t);
+        const max = 1 << solve.length;
+        for (let t = 0; t < max; t++)
+            yield stringify(solve, reverse ? ~t : t);
     }
     SolveRubik.solveAll = solveAll;
 })(SolveRubik || (SolveRubik = {}));

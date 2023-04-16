@@ -292,19 +292,24 @@ export var Solve;
         M[3], M[9], M[6],
         M[13], M[15], M[4],
     ];
-    const transformC = ((fn) => (raw, cT) => cT ? raw.map(fn, M[cT[0]]) : raw)(function (v) {
-        return this[~~(v / 3)] * 3 + v % 3;
-    });
-    const transformB = (raw, t = NaN) => (t === null || isNaN(t)) ?
-        raw :
-        raw.map(function (v) {
-            const b = t & 1;
-            t >>= 1;
+    const transformC = (raw, cT) => {
+        if (!cT)
+            return raw;
+        return raw.map(function (v) {
+            return this[~~(v / 3)] * 3 + v % 3;
+        }, M[cT[0]]);
+    };
+    const transformB = (raw, t = NaN) => {
+        if (t === null || isNaN(t))
+            return raw;
+        return ((r, tl) => r ? tl.reverse() : tl)(t < 0 && (t = ~t, true), Array.from({ length: raw.length }, (v = t & 1) => (t >>= 1, v))).map(function (b, i) {
+            let v = raw[i];
             v = this[~~(v / 3)] * 3 + v % 3;
             if (b ^ ~~(v / 9))
-                this.map(((a) => (v, i) => this[i] = a[v])(RM[v]));
+                this.map((p, i) => this[i] = RM[v][p]);
             return b * 9 + v % 9;
         }, [0, 1, 2, 3, 4, 5]);
+    };
     Solve.transform = (raw, { image, inverse, c: [c, cT], }, t = NaN) => {
         if (image)
             raw = raw.map((v) => (~~(v / 3) || 3) * 3 + (2 - v % 3));

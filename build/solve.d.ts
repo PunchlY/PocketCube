@@ -9,6 +9,6 @@ export declare class SolveRubik extends Rubik {
 export declare namespace SolveRubik {
     function from(rubik: BaseRubik | number): SolveRubik;
     function solve(scr: string, t?: number): string | false;
-    function solveAll(scr: string): Generator<string, boolean, unknown>;
+    function solveAll(scr: string, reverse?: boolean): Generator<string, boolean, unknown>;
 }
 export * from './index.js';

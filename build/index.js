@@ -20,10 +20,6 @@ export var Solve;
                         const { r: { position } } = data;
                         if (set.has(position))
                             return false;
-                        if (position > min.position)
-                            continue;
-                        min.position = position;
-                        min.build = Solve.transform(build, data, 0);
                     }
                     return true;
                 })())
@@ -119,9 +115,9 @@ const similar = ((CT) => function* (rubik, set, n, i) {
     else
         yield Turn._C[i][rubik.find(n)];
 });
-const turnParse = ((table, aregexp, gRegexp) => function* (scr) {
+const turnParse = ((table, aRegexp, gRegexp) => function* (scr) {
     scr = scr.replace(/\s/g, '');
-    if (!aregexp.test(scr))
+    if (!aRegexp.test(scr))
         return false;
     for (const [, t, p] of scr.matchAll(gRegexp))
         yield Turn[t][table[p]];
@@ -210,10 +206,10 @@ export class Rubik extends BaseRubik {
         }
     }
     ;
-    Rubik.prototype.solve = function solve(t = NaN) {
-        return Solve.stringify($solve(this), t);
-    };
     const { stringify } = Solve;
+    Rubik.prototype.solve = function solve(t = NaN) {
+        return stringify($solve(this), t);
+    };
     function solve(scr, t = NaN) {
         const rubik = new Rubik(0).do(scr);
         if (!rubik)

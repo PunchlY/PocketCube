@@ -18,9 +18,9 @@ export namespace Solve {
                     for (const data of _r.similarNoCongruence(0)) {
                         const { r: { position } } = data;
                         if (set.has(position)) return false;
-                        if (position > min.position) continue;
-                        min.position = position;
-                        min.build = transform(build, data, 0);
+                        // if (position > min.position) continue;
+                        // min.position = position;
+                        // min.build = transform(build, data, 0);
                     }
                     return true;
                 })()) yield min;
@@ -136,10 +136,10 @@ const similar = ((CT) =>
     else yield Turn._C[i][rubik.find(n)];
 });
 
-const turnParse = ((table, aregexp, gRegexp) =>
+const turnParse = ((table, aRegexp, gRegexp) =>
     function* (scr: string) {
         scr = scr.replace(/\s/g, '');
-        if (!aregexp.test(scr)) return false;
+        if (!aRegexp.test(scr)) return false;
         for (const [, t, p] of scr.matchAll(gRegexp))
             yield Turn[t][table[p]] as Readonly<Turn>;
     }
@@ -234,10 +234,10 @@ export namespace Rubik {
             return Solve.transform([...solve[position]], data);
         }
     };
-    Rubik.prototype.solve = function solve(t = NaN) {
-        return Solve.stringify($solve(this), t);
-    };
     const { stringify } = Solve;
+    Rubik.prototype.solve = function solve(t = NaN) {
+        return stringify($solve(this), t);
+    };
     export function solve(scr: string, t = NaN) {
         const rubik = new Rubik(0).do(scr);
         if (!rubik) return false;

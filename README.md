@@ -9,9 +9,7 @@ npm install pocketcube
 ```
 
 ```js
-const Rubik = require('pocketcube');
-const Turn = Rubik.Turn;
-// const { Rubik, Turn } = require('pocketcube');
+import { Rubik, Turn } from 'pocketcube';
 
 const rubik = new Rubik(0);
 rubik.action(Turn.R[0]);
@@ -22,7 +20,7 @@ rubik.do(`RF2U'`);
 解魔方:
 
 ```js
-const Rubik = require('pocketcube/solve');
+import { Rubik } from 'pocketcube/dist/PocketCube.solve.min.mjs';
 
 const rubik = new Rubik();
 rubik.do(`RF2U'B2LBD2L'`);
@@ -322,7 +320,7 @@ $$\begin{Bmatrix}C_iSC_j\end{Bmatrix}$$
 解魔方.
 
 ```js
-const Rubik = require('pocketcube/solve');
+import { Rubik } from 'pocketcube/dist/PocketCube.solve.min.mjs';
 new Rubik().do(`R'`).solve(); // R
 new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(); // F'LDF'D2FDL2F
 new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0); // F'RFU'F2UFR2U'

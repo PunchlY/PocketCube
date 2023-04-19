@@ -1,33 +1,3 @@
-/******/ // The require scope
-/******/ var __webpack_require__ = {};
-/******/ 
-/************************************************************************/
-/******/ /* webpack/runtime/define property getters */
-/******/ (() => {
-/******/ 	// define getter functions for harmony exports
-/******/ 	__webpack_require__.d = (exports, definition) => {
-/******/ 		for(var key in definition) {
-/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 			}
-/******/ 		}
-/******/ 	};
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/hasOwnProperty shorthand */
-/******/ (() => {
-/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ })();
-/******/ 
-/************************************************************************/
-var __webpack_exports__ = {};
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "m": () => (/* reexport */ Rubik)
-});
-
-;// CONCATENATED MODULE: ./build/rubik.js
 const { freeze, isFrozen: $isReadonly } = Object;
 const iterator8 = freeze([...Array(8).keys()]);
 const $readonly = (rubik) => {
@@ -38,7 +8,7 @@ const $readonly = (rubik) => {
     return freeze(rubik);
 };
 const CTMap = new WeakMap();
-const CT = CTMap.get.bind(CTMap);
+export const CT = CTMap.get.bind(CTMap);
 const copyL = (...l) => l.map((v) => [...v]);
 const CTToPosition = ([C, T]) => {
     const list = [8];
@@ -95,7 +65,7 @@ const inverse = (self) => {
     });
     return self;
 };
-const rubik_image = (self) => {
+const image = (self) => {
     const [C, T] = CT(self);
     const [tC, tT] = copyL(C, T);
     [1, 0, 3, 2, 5, 4, 7, 6].forEach((n, i, a) => {
@@ -140,7 +110,7 @@ const basePosition = [
     40288914, 53569564, 84835823,
     73463517, 71102743, 86465138,
 ];
-class Rubik {
+export class Rubik {
     static isReadonly(rubik) {
         return $isReadonly(rubik);
     }
@@ -190,7 +160,7 @@ class Rubik {
         return inverse($isReadonly(this) ? copy(this) : this);
     }
     image() {
-        return rubik_image($isReadonly(this) ? copy(this) : this);
+        return image($isReadonly(this) ? copy(this) : this);
     }
     static from(rubik) {
         if (rubik instanceof Rubik)
@@ -257,9 +227,3 @@ Object.defineProperties(Rubik.prototype, iterator8.map((i) => ({
         [4540624, 5469687, 929887],
     ].map((T) => freeze(T.map(Turn))), Rubik.R = _b[0], Rubik.U = _b[1], Rubik.F = _b[2], Rubik.L = _b[3], Rubik.D = _b[4], Rubik.B = _b[5];
 })(Rubik || (Rubik = {}));
-
-;// CONCATENATED MODULE: ./build/index.js
-
-
-var __webpack_exports__Rubik = __webpack_exports__.m;
-export { __webpack_exports__Rubik as Rubik };

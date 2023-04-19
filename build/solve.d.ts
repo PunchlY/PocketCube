@@ -1,1 +1,2 @@
-export * from './index.js';
+export { Rubik } from './rubik.js';
+export * from './solver.js';

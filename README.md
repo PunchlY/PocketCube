@@ -9,11 +9,11 @@ npm install pocketcube
 ```
 
 ```js
-import { Rubik, Turn } from 'pocketcube';
+import { Rubik } from 'pocketcube';
 
 const rubik = new Rubik(0);
-rubik.action(Turn.R[0]);
-rubik.action(Turn.U[2], Rubik.Turn.B[1]);
+rubik.action(Rubik.R[0]);
+rubik.action(Rubik.U[2], Rubik.Rubik.B[1]);
 rubik.do(`RF2U'`);
 ```
 
@@ -261,10 +261,10 @@ $$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},
 
 ```js
 const rubik = new Rubik();
-rubik.action(Turn.R[0]);
-rubik.action(Turn.U[2], Turn.B[1]);
+rubik.action(Rubik.R[0]);
+rubik.action(Rubik.U[2], Rubik.B[1]);
 rubik.action(new Rubik(123));
-rubik.action(new Rubik().action(Turn.R[0]));
+rubik.action(new Rubik().action(Rubik.R[0]));
 ```
 
 #### Rubik.prototype.do(str)
@@ -283,7 +283,7 @@ rubik.do(`R'`).do(`F2'`);
 
 ```js
 new Rubik().do(`R'`).isReinstated(); // false
-new Rubik().do(Turn.C[10]).isReinstated(); // true
+new Rubik().do(Rubik.C[10]).isReinstated(); // true
 ```
 
 #### Rubik.prototype.at(i)
@@ -332,63 +332,37 @@ new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F
 
 `t`为整数时, 按位以`0`: [`R` `U` `F`], `1`: [`L` `D` `B`], 分配公式字母.
 
-### Turn
+#### Rubik.C
+为`Rubik`实例的长度为`24`的数组, 其元素定义为魔方在空间中不同位置(朝向)的状态.
 
-#### Turn.prototype.copy()
+#### Rubik.R
+为`Rubik`实例的数组, 其元素分别定义为`"R"`旋转, `"R2"`旋转, `"R'"`旋转.
 
-与[Rubik.prototype.copy()](#rubikprototypecopy)相同.
+本质为`Rubik.C[0]`执行`"R"`(`"R2"`, `"R'"`)旋转后的状态.
 
-此方法将返回新的`Rubik`实例.
+#### Rubik.U
+类似[Rubik.R](#turnr)
 
-#### Turn.prototype.inverse()
+#### Rubik.F
+类似[Rubik.R](#turnr)
 
-与[Rubik.prototype.inverse()](#rubikprototypeinverse)相同.
+#### Rubik.L
+类似[Rubik.R](#turnr)
 
-此方法将返回新的`Rubik`实例.
+#### Rubik.D
+类似[Rubik.R](#turnr)
 
-#### Turn.prototype.image()
+#### Rubik.B
+类似[Rubik.R](#turnr)
 
-与[Rubik.prototype.image()](#rubikprototypeimage)相同.
+#### Rubik.X
+类似[Rubik.R](#turnr)
 
-此方法将返回新的`Rubik`实例.
+#### Rubik.Y
+类似[Rubik.R](#turnr)
 
-#### Turn.prototype.action(...rubiks)
-
-与[Rubik.prototype.action()](#rubikprototypeactionrubiks)相同.
-
-此方法将返回新的`Rubik`实例.
-
-#### Turn.C
-为`Turn`实例的长度为`24`的数组, 其元素定义为魔方在空间中不同位置(朝向)的状态.
-
-#### Turn.R
-为`Turn`实例的数组, 其元素分别定义为`"R"`旋转, `"R2"`旋转, `"R'"`旋转.
-
-本质为`Turn.C[0]`执行`"R"`(`"R2"`, `"R'"`)旋转后的状态.
-
-#### Turn.U
-类似[Turn.R](#turnr)
-
-#### Turn.F
-类似[Turn.R](#turnr)
-
-#### Turn.L
-类似[Turn.R](#turnr)
-
-#### Turn.D
-类似[Turn.R](#turnr)
-
-#### Turn.B
-类似[Turn.R](#turnr)
-
-#### Turn.X
-类似[Turn.R](#turnr)
-
-#### Turn.Y
-类似[Turn.R](#turnr)
-
-#### Turn.Z
-类似[Turn.R](#turnr)
+#### Rubik.Z
+类似[Rubik.R](#turnr)
 
 ## License
 

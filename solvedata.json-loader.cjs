@@ -1,4 +1,6 @@
 
+const dBit = 0;
+
 const chs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/~!@#%^&*()-_ ?[]{}:;<>,."|`$';
 const { length } = chs;
 const mlength = Math.ceil(Math.log(88179840) / Math.log(length));
@@ -11,7 +13,7 @@ const en = (/** @type {Record<number, number[]>} */o) => {
     delete o[0];
     const /** @type {string[][]} */a = [];
     for (let k in o) {
-        let v = ntoa(o[k].reduceRight((p, c) => p * 10 + c + 1, 0));
+        let v = ntoa(o[k].reduceRight((p, c) => p * 10 + c + 1 - dBit, 0));
         k = ntoa(k), (a[k.length - 1 + (v.length - 1) * mlength] ??= []).push(`${k}${v}`);
     }
     const /** @type {number[][]} */p = [];
@@ -26,14 +28,14 @@ const en = (/** @type {Record<number, number[]>} */o) => {
     return r;
 };
 
-const des = `(${((/** @type {string} */chs, /** @type {number} */length, /** @type {number} */mlength) => {
+const des = `(${((/** @type {string} */chs, /** @type {number} */length, /** @type {number} */mlength, /** @type {number} */dBit) => {
     const tab = Object.fromEntries([...chs].map((v, i) => [v, i]));
     const aton = (/** @type {string} */s) =>
         [...s].reduceRight((p, c) => p * length + tab[c], 0);
 
     const vfn = (/** @type {string} */v) =>
         [...(function* (n) {
-            do { yield (n % 10) - 1; } while ((n = Math.floor(n / 10)));
+            do { yield (n % 10) - 1 + dBit; } while ((n = Math.floor(n / 10)));
         })(aton(v))];
     const dsplit = function* (/** @type {string} */s, /** @type {number} */x, /** @type {number} */y) {
         for (let i = 0; i < s.length; i += x + y)
@@ -49,9 +51,9 @@ const des = `(${((/** @type {string} */chs, /** @type {number} */length, /** @ty
             }
         }());
         data[0] = [];
-        return data;
+        return Object.freeze(data);
     };
-}).toString()})(${[chs, length, mlength].map(JSON.stringify).join(',')})`;
+}).toString()})(${[chs, length, mlength, dBit].map(JSON.stringify).join(',')})`;
 
 /** @type {import('webpack').LoaderDefinition} */
 module.exports = function (source) {

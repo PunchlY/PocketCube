@@ -18,7 +18,7 @@ module.exports = {
         },
     },
     optimization: {
-        minimize: true,
+        minimize: false,
         chunkIds: 'deterministic',
         providedExports: true,
         usedExports: true,

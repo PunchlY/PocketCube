@@ -3,6 +3,7 @@ type L = [number, number, number, number, number, number, number, number];
 declare const CTMap: WeakMap<Rubik | Readonly<Rubik>, CT>;
 export type CT = [L, L];
 export declare const CT: typeof CTMap.get;
+export declare const isNumber: (n: any) => n is number;
 export declare namespace Rubik {
     interface Similar {
         rubik: Readonly<Rubik>;

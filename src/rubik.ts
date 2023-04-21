@@ -9,10 +9,12 @@ export type CT = [L, L];
 export const CT: typeof CTMap.get = CTMap.get.bind(CTMap);
 const copyL = (...l: CT) => l.map((v) => [...v] as L) as CT;
 
+export const isNumber = (n: any): n is number => n !== null && !isNaN(n);
+
 const positionMap = new WeakMap<Rubik, number>();
 const getPosition = (rubik: Rubik) => {
     let position = positionMap.get(rubik);
-    if (position !== null && !isNaN(position)) return position;
+    if (isNumber(position)) return position;
     const [C, T] = CT(rubik);
     const list = [8];
     position = T.slice(0, -1).reduceRight((p, c) => p * 3 + c, C.reduceRight((p, c, i) => {
@@ -110,9 +112,10 @@ const similarly = ((Ct) =>
             }
         }
     }
-)(function* (rubik: Rubik, n?: number, i = 0) {
-    if (n === null || isNaN(n)) for (const cT of Rubik.Base) yield cT;
-    else yield Rubik._Base[i][rubik.find(n)];
+)(function* (rubik: Rubik, n?: number, i?: number) {
+    if (isNumber(n))
+        yield Rubik._Base[isNumber(i) ? i : ~~(n / 3)][rubik.find(n)];
+    else for (const cT of Rubik.Base) yield cT;
 });
 
 const turnParse = ((table, aRegexp, gRegexp) =>

@@ -1,15 +1,15 @@
-import { Solver, Build } from '../build/solver.js';
+import { Solver } from '../build/solver.js';
 
 let n = 0, l = 0;
-/** @type {Record<number,import('../build/solver.js').Build>} */
+/** @type {Record<number,number[]>} */
 const json = {};
-for await (const { build, rubik } of Solver([
-    0, 2,
-    3, 5,
-    6, 8,
-    1, 4, 7
-], 11)) {
-    json[rubik.position] = build;
+for await (const { build, rubik: { position } } of Solver([
+    9, 11,
+    12, 14,
+    15, 17,
+    10, 13, 16
+], 11, 7)) {
+    json[position] = build;
 
     n++, l = build.length > l ? (console.log(l), build.length) : l;
 

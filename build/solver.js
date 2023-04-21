@@ -1,8 +1,7 @@
-import { CT, Rubik } from './rubik.js';
+import { CT, Rubik, isNumber } from './rubik.js';
 const Turns = [
     ...Rubik.R, ...Rubik.U, ...Rubik.F,
     ...Rubik.L, ...Rubik.D, ...Rubik.B,
-    ...Rubik.X, ...Rubik.Y, ...Rubik.Z,
 ];
 const TurnNames = [
     'R', 'R2', 'R\'',
@@ -70,12 +69,7 @@ export class Build extends Array {
         return this;
     }
     image() {
-        super.forEach((v, i) => {
-            const t = ~~(v / 3);
-            if (t === 6)
-                return;
-            super[i] = (t || 3) * 3 + (2 - v % 3);
-        });
+        super.forEach((v, i) => super[i] = (~~(v / 3) || 3) * 3 + (2 - v % 3));
         return this;
     }
     inverse() {
@@ -87,10 +81,10 @@ export class Build extends Array {
         const st = ((r, st) => r ? st.reverse() : st)(t < 0 && (t = ~t, true), Array.from({ length: this.length }, (v = t & 1) => (t >>= 1, v)));
         const graph = [0, 1, 2, 3, 4, 5];
         st.forEach((b, i) => {
-            let v = graph[i];
+            let v = this[i];
             v = graph[~~(v / 3)] * 3 + v % 3;
             if (b ^ ~~(v / 9))
-                graph.forEach((p, i) => graph[i] = TurnBase[v]?.[p] ?? graph[i]);
+                graph.forEach((p, i) => graph[i] = TurnBase[v]?.[p] ?? p);
             super[i] = b * 9 + v % 9;
         });
         return this;
@@ -99,7 +93,8 @@ export class Build extends Array {
         return super.map((v) => TurnNames[v]).join('');
     }
 }
-export function* Solver(eT, max = Infinity) {
+export async function* Solver(eT, max = Infinity, i) {
+    const n = isNumber(i) ? i * 3 : null;
     const set = new Set();
     let map = new Map([[Rubik.Base[0], []]]), _map = new Map(), l = 0;
     while (l - 1 < max && map.size) {
@@ -107,13 +102,13 @@ export function* Solver(eT, max = Infinity) {
             if (set.has(rubik.position))
                 continue;
             if ((() => {
-                for (const { rubik: { position } } of rubik.similarlyNoCongruent(0))
+                for (const { rubik: { position } } of rubik.similarlyNoCongruent(n, i))
                     if (set.has(position))
                         return false;
                 return true;
             })())
                 yield { rubik, build };
-            for (const { rubik: { position } } of rubik.congruent(0))
+            for (const { rubik: { position } } of rubik.congruent(n, i))
                 set.add(position);
             eT.filter((n) => !build.length || ~~((build.at(-1) - n) / 3)).forEach((n) => _map.set(rubik.action(Turns[n]).readonly(), [...build, n]));
             eT.filter((n) => !build.length || ~~((build.at(0) - n) / 3)).forEach((n) => _map.set(Turns[n].action(rubik).readonly(), [n, ...build]));
@@ -141,7 +136,7 @@ export function* Solver(eT, max = Infinity) {
         const solve = solveRaw(this);
         if (!solve)
             return false;
-        if (t !== null)
+        if (isNumber(t))
             solve.bits(t);
         return solve.stringify();
     };

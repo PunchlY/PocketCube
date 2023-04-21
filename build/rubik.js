@@ -3,10 +3,11 @@ const iterator8 = freeze([...Array(8).keys()]);
 const CTMap = new WeakMap();
 export const CT = CTMap.get.bind(CTMap);
 const copyL = (...l) => l.map((v) => [...v]);
+export const isNumber = (n) => n !== null && !isNaN(n);
 const positionMap = new WeakMap();
 const getPosition = (rubik) => {
     let position = positionMap.get(rubik);
-    if (position !== null && !isNaN(position))
+    if (isNumber(position))
         return position;
     const [C, T] = CT(rubik);
     const list = [8];
@@ -89,12 +90,12 @@ const similarly = ((Ct) => function* (rawRubik, set, n, i) {
             yield { rubik, base, coordinate };
         }
     }
-})(function* (rubik, n, i = 0) {
-    if (n === null || isNaN(n))
+})(function* (rubik, n, i) {
+    if (isNumber(n))
+        yield Rubik._Base[isNumber(i) ? i : ~~(n / 3)][rubik.find(n)];
+    else
         for (const cT of Rubik.Base)
             yield cT;
-    else
-        yield Rubik._Base[i][rubik.find(n)];
 });
 const turnParse = ((table, aRegexp, gRegexp) => function* (scr) {
     scr = scr.replace(/\s/g, '');

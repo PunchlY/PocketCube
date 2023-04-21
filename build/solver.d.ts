@@ -15,7 +15,7 @@ export declare class Build extends Array<number> {
 export interface Solver {
     solve(t?: number): string | false;
 }
-export declare function Solver(eT: number[], max?: number): Generator<{
+export declare function Solver(eT: number[], max?: number, i?: number): AsyncGenerator<{
     rubik: Readonly<Rubik>;
     build: number[];
 }, void, unknown>;

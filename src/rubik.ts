@@ -1,16 +1,7 @@
 import type { Solver } from './solver.js';
 
-const { freeze, isFrozen: $isReadonly } = Object;
+const { freeze, isFrozen } = Object;
 const iterator8 = freeze([...Array(8).keys()]);
-
-const $readonly = (rubik: Rubik) => {
-    if ($isReadonly(rubik)) return rubik;
-    Object.defineProperty(rubik, 'position', { value: CTToPosition(CT(rubik)) });
-    Array.from({ length: 8 }, (v, i) =>
-        Object.defineProperty(rubik, i, { value: rubik[i] })
-    );
-    return freeze(rubik);
-};
 
 type L = [number, number, number, number, number, number, number, number];
 const CTMap = new WeakMap<Rubik | Readonly<Rubik>, CT>();
@@ -18,32 +9,37 @@ export type CT = [L, L];
 export const CT: typeof CTMap.get = CTMap.get.bind(CTMap);
 const copyL = (...l: CT) => l.map((v) => [...v] as L) as CT;
 
-const CTToPosition = ([C, T]: [L, L]) => {
+const positionMap = new WeakMap<Rubik, number>();
+const getPosition = (rubik: Rubik) => {
+    let position = positionMap.get(rubik);
+    if (position !== null && !isNaN(position)) return position;
+    const [C, T] = CT(rubik);
     const list = [8];
-    return T.slice(0, -1).reduceRight((p, c) => p * 3 + c, C.reduceRight((p, c, i) => {
+    position = T.slice(0, -1).reduceRight((p, c) => p * 3 + c, C.reduceRight((p, c, i) => {
         const o = list.findIndex((v) => c < v);
         list.splice(o, 0, c);
         return p * (8 - i) + o;
     }, 0));
+    positionMap.set(rubik, position);
+    return position;
 };
-const positionToCT = (position: number, rubik: Rubik) => {
-    position = ~~position;
+const setPosition = (rubik: Rubik, position: number) => {
+    positionMap.set(rubik, position = (position & 2147483647) % 88179840);
     if (!position) CTMap.set(rubik, [[0, 1, 2, 3, 4, 5, 6, 7], [0, 0, 0, 0, 0, 0, 0, 0]]);
     const T: L = [] as any, C: L = [] as any;
     T.push((3 - Array.from({ length: 7 } as number[]).reduce((p, c = position % 3) => {
         T.push(c);
-        position = ~~(position / 3);
+        position /= 3, position |= 0;
         return p + c;
     }, 0) % 3) % 3);
     iterator8.forEach(function (this: number[], i) {
         C.push(this.splice(position % (8 - i), 1)[0]);
-        position = ~~(position / (8 - i));
+        position /= 8 - i, position |= 0;
     }, [...iterator8]);
-    rubik && CTMap.set(rubik, [C, T]);
+    CTMap.set(rubik, [C, T]);
 };
 
-const at = (rubik: Rubik, i: number) => {
-    const [C, T] = CT(rubik);
+const at = ([C, T]: CT, i: number) => {
     return C.at(i) * 3 + T.at(i);
 };
 
@@ -53,7 +49,9 @@ const copy = <T extends Rubik>(rubik: Rubik, constructor?: new (...arg: any) => 
     CTMap.set(copy, copyL(...CT(rubik)));
     return copy;
 };
-const action = <T extends Rubik>(self: T, rubiks: Iterable<Rubik | Readonly<Rubik>>) => {
+const copyFreeze = <T extends Rubik>(rubik: T | Readonly<T>): T => isFrozen(rubik) ? copy(rubik) : rubik;
+const action = <T extends Rubik>(self: T | Readonly<T>, rubiks: Iterable<Rubik | Readonly<Rubik>>): T => {
+    positionMap.set(self = copyFreeze(self), NaN);
     const [C, T] = CT(self);
     for (const rubik of rubiks) {
         const [tC, tT] = copyL(C, T);
@@ -65,7 +63,8 @@ const action = <T extends Rubik>(self: T, rubiks: Iterable<Rubik | Readonly<Rubi
     }
     return self;
 };
-const inverse = <T extends Rubik>(self: T) => {
+const inverse = <T extends Rubik>(self: T | Readonly<T>): T => {
+    positionMap.set(self = copyFreeze(self), NaN);
     const [C, T] = CT(self);
     const [tC, tT] = copyL(C, T);
     tC.forEach((n, i) => {
@@ -74,7 +73,8 @@ const inverse = <T extends Rubik>(self: T) => {
     });
     return self;
 };
-const image = <T extends Rubik>(self: T) => {
+const image = <T extends Rubik>(self: T | Readonly<T>): T => {
+    positionMap.set(self = copyFreeze(self), NaN);
     const [C, T] = CT(self);
     const [tC, tT] = copyL(C, T);
     [1, 0, 3, 2, 5, 4, 7, 6].forEach((n, i, a) => {
@@ -97,12 +97,12 @@ export namespace Rubik {
         inverse: false;
     }
 }
-const similar = ((Ct) =>
+const similarly = ((Ct) =>
     function* (rawRubik: Rubik, set: Set<number>, n?: number, i?: number) {
         for (const base of Rubik.Base) {
-            const baseRubik = base.action(rawRubik);
+            const baseRubik = base.action(rawRubik).readonly();
             for (const coordinate of Ct(baseRubik, n, i)) {
-                const rubik = Rubik.readonly(baseRubik.copy().action(coordinate));
+                const rubik = baseRubik.action(coordinate).readonly();
                 const { position } = rubik;
                 if (set.has(position)) continue;
                 set.add(position);
@@ -146,57 +146,50 @@ export interface Rubik extends Solver, ArrayLike<number>, Iterable<number> {
     readonly 7: number;
 }
 export class Rubik {
-    static isReadonly(rubik: Rubik | Readonly<Rubik>) {
-        return $isReadonly(rubik);
-    }
-    static readonly(rubik: Rubik | Readonly<Rubik>) {
-        return $readonly(rubik);
-    }
-    static get [Symbol.species]() {
-        return this;
-    }
-    constructor(position = 0, readonly = false) { // genotype %= 88179840;
-        positionToCT(position, this);
-        if (readonly) $readonly(this);
+    static get [Symbol.species]() { return this; }
+    constructor(position?: number) { // genotype %= 88179840;
+        setPosition(this, position);
     }
 
     get position() {
-        return CTToPosition(CT(this));
-    }
-    set position(position: number) {
-        positionToCT(position, this);
+        return getPosition(this);
     }
     get length() { return 8; }
     get [Symbol.isConcatSpreadable]() { return true; }
     at(i: number) {
-        const [C, T] = CT(this);
-        return C.at(i) * 3 + T.at(i);
+        return at(CT(this), i);
     }
     find(n: number) {
         const [C, T] = CT(this);
         const p = C.indexOf(~~(n / 3) % 8);
         return p * 3 + (3 + (n % 3) - T[p]) % 3;
     }
-
     *[Symbol.iterator]() {
-        const [C, T] = CT(this);
+        const _CT = CT(this);
         for (let i = 0; i < 8; i++)
-            yield C[i] * 3 + T[i];
+            yield at(_CT, i);
     }
 
-    copy(readonly?: boolean) {
-        const rubik = copy(this);
-        if (readonly) $readonly(rubik);
-        return rubik;
+    readonly() {
+        return freeze(this);
+    }
+    copy() {
+        return copy(this);
     }
     action(...rubiks: (Rubik | Readonly<Rubik>)[]): Rubik | this {
-        return action($isReadonly(this) ? copy(this) : this, rubiks);
+        return action(this, rubiks);
     }
     inverse(): Rubik | this {
-        return inverse($isReadonly(this) ? copy(this) : this);
+        return inverse(this);
     }
     image(): Rubik | this {
-        return image($isReadonly(this) ? copy(this) : this);
+        return image(this);
+    }
+    similar(base: number): Rubik | this {
+        const rubik = action(Rubik.Base[base], [this, Rubik.BaseT[base]]);
+        if (isFrozen(this)) return rubik;
+        setPosition(this, rubik.position);
+        return this;
     }
 
     static from(rubik: Rubik | number) {
@@ -206,35 +199,35 @@ export class Rubik {
             return new this[Symbol.species](rubik);
     }
 
-    do(scr: string) {
+    do(scr: string): Rubik | this {
         if (!scr) return this;
         return action(this, turnParse(scr));
     }
 
     isReinstated() {
-        return basePosition[this[0]] === this.position;
+        return basePosition[at(CT(this), 0)] === getPosition(this);
     }
 
-    *similar(n?: number, i?: number) {
-        const rubik = freeze(copy(this, Rubik));
+    *similarly(n?: number, i?: number) {
+        const rawRubik = copy(this, Rubik).readonly();
         const set = new Set<number>();
-        for (const [t, self] of [this, rubik.image(), rubik.inverse(), rubik.image().inverse()].entries()) {
-            if (set.has(self.position)) continue;
-            for (const s of similar(self, set, n, i))
-                yield { ...s, image: !!(t & 1), inverse: !!(t & 2) } as Rubik.Similar;
+        for (const [t, rubik] of [this, rawRubik.image(), rawRubik.inverse(), rawRubik.image().inverse()].entries()) {
+            if (set.has(rubik.position)) continue;
+            for (const data of similarly(rubik, set, n, i))
+                yield { ...data, image: !!(t & 1), inverse: !!(t & 2) } as Rubik.Similar;
         }
     }
     *congruent(n?: number, i?: number) {
-        for (const s of similar(this, new Set(), n, i))
-            yield { ...s, image: false, inverse: false } as Rubik.Congruent;
+        for (const data of similarly(this, new Set(), n, i))
+            yield { ...data, image: false, inverse: false } as Rubik.Congruent;
     }
-    *similarNoCongruence(n?: number, i?: number) {
-        const rubik = freeze(copy(this, Rubik));
+    *similarlyNoCongruent(n?: number, i?: number) {
+        const rawRubik = copy(this, Rubik).readonly();
         const set = new Set<number>();
-        for (const [t, self] of [, rubik.image(), rubik.inverse(), rubik.image().inverse()].entries()) {
-            if (!self || set.has(self.position)) continue;
-            for (const s of similar(self, set, n, i))
-                yield { ...s, image: !!(t & 1), inverse: !!(t & 2) } as Rubik.Similar;
+        for (const [t, rubik] of [, rawRubik.image(), rawRubik.inverse(), rawRubik.image().inverse()].entries()) {
+            if (!rubik || set.has(rubik.position)) continue;
+            for (const data of similarly(rubik, set, n, i))
+                yield { ...data, image: !!(t & 1), inverse: !!(t & 2) } as Rubik.Similar;
         }
     }
     solve(t?: number): string | false {
@@ -242,12 +235,15 @@ export class Rubik {
     }
 }
 Object.defineProperties(Rubik.prototype, iterator8.map((i) => ({
-    get(this: Rubik) { return at(this, i); },
+    get(this: Rubik) { return at(CT(this), i); },
     enumerable: true
 } as PropertyDescriptor)) as { [key: number]: PropertyDescriptor; });
 
 export namespace Rubik {
-    const Turn = (g: number) => new Rubik(g, true) as Readonly<Rubik>;
+    export const isReadonly: (rubik: Rubik | Readonly<Rubik>) => boolean = isFrozen;
+    export const readonly: <T extends Rubik>(rubik: T | Readonly<T>) => Readonly<T> = freeze;
+
+    const Turn = (g: number) => new Rubik(g).readonly() as Readonly<Rubik>;
 
     type Turn = Readonly<Rubik>;
     type Turns = readonly [Turn, Turn, Turn];
@@ -255,6 +251,8 @@ export namespace Rubik {
     type _Base = readonly [Base, Base, Base, Base, Base, Base, Base, Base];
 
     export const Base = freeze(basePosition.map(Turn)) as Base;
+
+    export const BaseT = freeze(Base.map((v) => Base[v.find(0)])) as Base;
 
     export const _Base = freeze(iterator8.map(
         (i) => freeze([...Base].sort((c1, c2) => c1[i] - c2[i]))

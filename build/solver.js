@@ -1,5 +1,4 @@
 import { CT, Rubik } from './rubik.js';
-const { readonly } = Rubik;
 const Turns = [
     ...Rubik.R, ...Rubik.U, ...Rubik.F,
     ...Rubik.L, ...Rubik.D, ...Rubik.B,
@@ -44,7 +43,8 @@ const BaseT = Base_BaseT[0];
 const BaseBaseT = Base_BaseT.map((l, i) => l[i]);
 export class Build extends Array {
     constructor(build) {
-        build.length ? super(...build) : super();
+        super();
+        super.push(...Array.from(build));
     }
     copy() {
         return new Build(this);
@@ -84,13 +84,13 @@ export class Build extends Array {
         return this;
     }
     bits(t) {
-        const st = ((r, st) => r ? st.reverse() : st)(t < 0 && (t = ~t, true), Array.from({ length: super.length }, (v = t & 1) => (t >>= 1, v)));
+        const st = ((r, st) => r ? st.reverse() : st)(t < 0 && (t = ~t, true), Array.from({ length: this.length }, (v = t & 1) => (t >>= 1, v)));
         const graph = [0, 1, 2, 3, 4, 5];
         st.forEach((b, i) => {
             let v = graph[i];
             v = graph[~~(v / 3)] * 3 + v % 3;
             if (b ^ ~~(v / 9))
-                graph.forEach((p, i) => graph[i] = TurnBase[v][p]);
+                graph.forEach((p, i) => graph[i] = TurnBase[v]?.[p] ?? graph[i]);
             super[i] = b * 9 + v % 9;
         });
         return this;
@@ -101,40 +101,36 @@ export class Build extends Array {
 }
 export function* Solver(eT, max = Infinity) {
     const set = new Set();
-    let map = new Map([[readonly(new Rubik(0)), []]]), _map = new Map(), l = 0;
+    let map = new Map([[Rubik.Base[0], []]]), _map = new Map(), l = 0;
     while (l - 1 < max && map.size) {
         for (const [rubik, build] of map) {
-            const { position } = rubik;
-            if (set.has(position))
+            if (set.has(rubik.position))
                 continue;
             if ((() => {
-                for (const { rubik: { position } } of rubik.similarNoCongruence(0))
+                for (const { rubik: { position } } of rubik.similarlyNoCongruent(0))
                     if (set.has(position))
                         return false;
                 return true;
             })())
-                yield {
-                    build: new Build(build),
-                    rubik,
-                };
-            for (const { rubik: r } of rubik.congruent(0))
-                set.add(r.position);
-            eT.filter((n) => !build.length || ~~((build.at(-1) - n) / 3)).forEach((n) => _map.set(readonly(rubik.action(Turns[n])), [...build, n]));
-            eT.filter((n) => !build.length || ~~((build.at(0) - n) / 3)).forEach((n) => _map.set(readonly(Turns[n].action(rubik)), [n, ...build]));
+                yield { rubik, build };
+            for (const { rubik: { position } } of rubik.congruent(0))
+                set.add(position);
+            eT.filter((n) => !build.length || ~~((build.at(-1) - n) / 3)).forEach((n) => _map.set(rubik.action(Turns[n]).readonly(), [...build, n]));
+            eT.filter((n) => !build.length || ~~((build.at(0) - n) / 3)).forEach((n) => _map.set(Turns[n].action(rubik).readonly(), [n, ...build]));
         }
         map = _map, _map = new Map(), l++;
     }
 }
 (function (Solver) {
     function solveRaw(rubik) {
-        for (const { rubik: { position }, image, inverse, base, coordinate } of rubik.similar()) {
+        for (const { rubik: { position }, image, inverse, base, coordinate } of rubik.similarly()) {
             if (!(position in Solver.data))
                 continue;
             const solve = new Build(Solver.data[position]);
-            if (image)
-                solve.image();
             if (!inverse)
                 solve.inverse();
+            if (image)
+                solve.image();
             return solve.base(((c) => image ? c.image() : c)(inverse ? base.inverse() : coordinate)[0]);
         }
         return false;

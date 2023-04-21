@@ -18,7 +18,7 @@ module.exports = {
         },
     },
     optimization: {
-        minimize: false,
+        minimize: true,
         chunkIds: 'deterministic',
         providedExports: true,
         usedExports: true,
@@ -30,7 +30,7 @@ module.exports = {
             {
                 test: /solvedata\.json$/,
                 type: 'javascript/auto',
-                use: [resolve(__dirname, 'solvedata.json-loader.cjs')],
+                use: [resolve(__dirname, 'solve/solvedata.json-loader.cjs')],
             },
         ],
     },

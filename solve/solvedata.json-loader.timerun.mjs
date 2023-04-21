@@ -1,5 +1,13 @@
+import { Rubik, Build } from '../build/index.js';
 
-const dBit = 0;
+const dBit = 9;
+function* min(/** @type {import('../build/index.js').Build} */rubik, /** @type {import('../build/index.js').Build} */build) {
+    for (const n of [21, 22, 23])
+        yield {
+            position: rubik.copy().similar(n).position,
+            build: build.copy().similar(n),
+        };
+}
 
 const chs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/~!@#%^&*()-_ ?[]{}:;<>,."|`$';
 const { length } = chs;
@@ -9,12 +17,18 @@ const ntoa = (/** @type {number} */n) =>
     [...(function* (n) {
         do { yield n % length; } while (n = Math.floor(n / length));
     })(n)].map((n) => chs[n]).join('');
-const en = (/** @type {Record<number, number[]>} */o) => {
+
+export const en = (/** @type {Record<number, number[]>} */o) => {
     delete o[0];
     const /** @type {string[][]} */a = [];
-    for (let k in o) {
-        let v = ntoa(o[k].reduceRight((p, c) => p * 10 + c + 1 - dBit, 0));
-        k = ntoa(k), (a[k.length - 1 + (v.length - 1) * mlength] ??= []).push(`${k}${v}`);
+    for (let rawPosition in o) {
+        const rawBuild = o[rawPosition];
+        const { position, build } = [
+            ...min(new Rubik(rawPosition), new Build(rawBuild))
+        ].sort((a, b) => a[0] - b[0])[0];
+        const sBuild = ntoa(build.reduceRight((p, c) => p * 10 + c + 1 - dBit, 0));
+        const sPosition = ntoa(position);
+        (a[sPosition.length - 1 + (sBuild.length - 1) * mlength] ??= []).push(`${sPosition}${sBuild}`);
     }
     const /** @type {number[][]} */p = [];
     const /** @type {[string,[number,number][]]} */r = [
@@ -28,7 +42,7 @@ const en = (/** @type {Record<number, number[]>} */o) => {
     return r;
 };
 
-const des = `(${((/** @type {string} */chs, /** @type {number} */length, /** @type {number} */mlength, /** @type {number} */dBit) => {
+export const des = `(${((/** @type {string} */chs, /** @type {number} */length, /** @type {number} */mlength, /** @type {number} */dBit) => {
     const tab = Object.fromEntries([...chs].map((v, i) => [v, i]));
     const aton = (/** @type {string} */s) =>
         [...s].reduceRight((p, c) => p * length + tab[c], 0);
@@ -54,8 +68,3 @@ const des = `(${((/** @type {string} */chs, /** @type {number} */length, /** @ty
         return Object.freeze(data);
     };
 }).toString()})(${[chs, length, mlength, dBit].map(JSON.stringify).join(',')})`;
-
-/** @type {import('webpack').LoaderDefinition} */
-module.exports = function (source) {
-    return `export default (${des})(${en(JSON.parse(source)).map(JSON.stringify).join(',')})`;
-};

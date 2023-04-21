@@ -1,7 +1,7 @@
 import { Rubik } from './rubik.js';
 type Graph = readonly [number, number, number, number, number, number];
 export declare class Build extends Array<number> {
-    constructor(build: number[] | readonly number[]);
+    constructor(build: ArrayLike<number>);
     copy(): Build;
     mapping(graph: Graph): this;
     base(base: number): this;
@@ -16,8 +16,8 @@ export interface Solver {
     solve(t?: number): string | false;
 }
 export declare function Solver(eT: number[], max?: number): Generator<{
-    build: Build;
     rubik: Readonly<Rubik>;
+    build: number[];
 }, void, unknown>;
 export declare namespace Solver {
     let data: typeof import('./solvedata.json').default;

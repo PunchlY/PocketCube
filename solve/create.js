@@ -1,4 +1,4 @@
-import { Solver } from '../build/solver.js';
+import { Solver, Build } from '../build/solver.js';
 
 let n = 0, l = 0;
 /** @type {Record<number,import('../build/solver.js').Build>} */
@@ -13,7 +13,7 @@ for await (const { build, rubik } of Solver([
 
     n++, l = build.length > l ? (console.log(l), build.length) : l;
 
-    console.log(build.stringify());
+    // console.log(new Build(build).stringify());
 }
 
 console.log('size:', n);

@@ -370,7 +370,7 @@ new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F
         DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
                     Version 2, December 2004
 
- Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+ Copyright (C) 2004 PunchlY <punchly@foxmail.com>
 
  Everyone is permitted to copy and distribute verbatim or modified
  copies of this license document, and changing it is allowed as long

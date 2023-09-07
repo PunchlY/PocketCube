@@ -19,6 +19,7 @@
         "strictNullChecks": false,
         "removeComments": true,
         "allowJs": true,
+        "noEmit": true,
         "noImplicitThis": true,
         "resolveJsonModule": true,
     },

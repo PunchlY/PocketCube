@@ -1,9 +1,6 @@
-import { CT, Rubik, isNumber } from './rubik.js';
+import * as Rubik from './util.js';
+import data from 'solvedata.json';
 
-const Turns = [
-    ...Rubik.R, ...Rubik.U, ...Rubik.F,
-    ...Rubik.L, ...Rubik.D, ...Rubik.B,
-] as const;
 const TurnNames = [
     'R', 'R2', 'R\'',
     'U', 'U2', 'U\'',
@@ -14,9 +11,36 @@ const TurnNames = [
     'X', 'X2', 'X\'',
     'Y', 'Y2', 'Y\'',
     'Z', 'Z2', 'Z\'',
-] as const;
+];
+const Position = Object.fromEntries([
+    ...Rubik.R, ...Rubik.U, ...Rubik.F,
+    ...Rubik.L, ...Rubik.D, ...Rubik.B,
+    ...Rubik.X, ...Rubik.Y, ...Rubik.Z,
+].map(({ position }, i) => [position, i]));
 
-type Graph = readonly [number, number, number, number, number, number];
+type Graph = readonly [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];
+const Image: Graph = [
+    11, 10, 9,
+    5, 4, 3,
+    8, 7, 6,
+    2, 1, 0,
+    14, 13, 12,
+    17, 16, 15,
+    18, 19, 20,
+    23, 22, 21,
+    26, 25, 24,
+];
+const Inverse: Graph = [
+    2, 1, 0,
+    5, 4, 3,
+    8, 7, 6,
+    11, 10, 9,
+    14, 13, 12,
+    17, 16, 15,
+    20, 19, 18,
+    23, 22, 21,
+    26, 25, 24,
+];
 const Base = [
     , [1, 2, 0, 4, 5, 3], [2, 0, 1, 5, 3, 4],
     [2, 1, 3, 5, 4, 0], [1, 3, 2, 4, 0, 5], [3, 2, 1, 0, 5, 4],
@@ -26,141 +50,78 @@ const Base = [
     [3, 4, 2, 0, 1, 5], [4, 2, 3, 1, 5, 0], [2, 3, 4, 5, 0, 1],
     [0, 4, 5, 3, 1, 2], [4, 5, 0, 1, 2, 3], [5, 0, 4, 2, 3, 1],
     [5, 4, 3, 2, 1, 0], [4, 3, 5, 1, 0, 2], [3, 5, 4, 0, 2, 1],
-] as Graph[];
-const TurnBase = [
-    14, 18, 8,
-    6, 9, 3,
-    4, 15, 13,
+].map((g) => [...g, ...g.slice(0, 3).map((v) => v + 6)].flatMap((v) => [v * 3, v * 3 + 1, v * 3 + 2]) as unknown as Graph);
+
+const base_c_cT = Array.from({ length: 24 }, (_v, i) => Rubik.Base.map((c) => c.find(i)));
+const base_cT = base_c_cT[0];
+const base_ccT = base_c_cT.map((l, i) => l[i]);
+const base_turnT = [
     8, 18, 14,
     3, 9, 6,
     13, 15, 4,
     14, 18, 8,
     6, 9, 3,
     4, 15, 13,
-].map((n) => Base[n]);
-const Base_Base = Rubik.Base.map((c) => Array.from({ length: 24 }, ([C, T]: CT = CT(c), i) => Base[C[i / 3] * 3 + (T[i / 3] + i) % 3]));
-const Base_BaseT = Array.from({ length: 24 }, (v, i) => Rubik.Base.map((c) => Base[c.find(i)]));
-const BaseT = Base_BaseT[0];
-const BaseBaseT = Base_BaseT.map((l, i) => l[i]);
+];
 
-export class Build extends Array<number>{
-    constructor(build: ArrayLike<number>) {
-        super();
-        super.push(...Array.from(build));
+class Build {
+    private declare data: number[];
+    static from(data: number[]) {
+        const build = new this();
+        build.data = data;
+        return build;
     }
-    copy() {
-        return new Build(this);
-    }
-    mapping(graph: Graph) {
-        if (!graph) return this;
-        super.forEach((v, i) => super[i] = graph[~~(v / 3)] * 3 + v % 3);
+    private map(graph: Graph) {
+        this.data.forEach((v, i) => this.data[i] = graph[v]);
         return this;
     }
+
     base(base: number) {
-        Build.prototype.mapping.call(this, Base[base]);
-        return this;
+        return this.map(Base[base]);
     }
     coordinate(coordinate: number) {
-        Build.prototype.mapping.call(this, BaseT[coordinate]);
-        return this;
+        return this.map(Base[base_cT[coordinate]]);
     }
     similar(base: number) {
-        const { mapping } = Build.prototype;
-        mapping.call(this, Base[base]);
-        mapping.call(this, BaseBaseT[base]);
+        this.map(Base[base]);
+        this.map(Base[base_ccT[base]]);
         return this;
     }
     image() {
-        super.forEach((v, i) => super[i] = (~~(v / 3) || 3) * 3 + (2 - v % 3));
+        this.map(Image);
         return this;
     }
     inverse() {
-        super.reverse();
-        super.forEach((v, i) => super[i] = ~~(v / 3) * 3 + (2 - v % 3));
+        this.data.reverse();
+        this.map(Inverse);
         return this;
     }
     bits(t: number) {
-        const st = ((r, st) =>
-            r ? st.reverse() : st
-        )(
-            t < 0 && (t = ~t, true),
-            Array.from({ length: this.length },
-                (v: number = t & 1) => (t >>= 1, v)
-            ),
-        );
-        const graph = [0, 1, 2, 3, 4, 5];
-        st.forEach((b, i) => {
+        let graph = 0;
+        Array.from({ length: this.data.length },
+            (v: number = t & 1) => (t >>= 1, v)
+        ).forEach((b, i) => {
             let v = this[i];
-            v = graph[~~(v / 3)] * 3 + v % 3;
-            if (b ^ ~~(v / 9)) graph.forEach((p, i) => graph[i] = TurnBase[v]?.[p] ?? p);
-            super[i] = b * 9 + v % 9;
+            v = Base[graph]?.[v] ?? v;
+            if (v >= 18) return this.data[i] = v;
+            if (b ^ (~~(v / 9))) graph = base_c_cT[graph][base_turnT[v]];
+            this.data[i] = b * 9 + v % 9;
         });
         return this;
     }
-    stringify() {
-        return super.map((v) => TurnNames[v]).join('');
+    toString() {
+        return this.data.map((v) => TurnNames[v]).join('');
     }
 }
 
-export interface Solver {
-    solve(t?: number): string | false;
-}
-export async function* Solver(eT: number[], max = Infinity, i?: number) {
-    const n = isNumber(i) ? i * 3 : null;
-    const set = new Set();
-    let map = new Map([[Rubik.Base[0], [] as number[]]]), _map: typeof map = new Map(), l = 0;
-    while (l - 1 < max && map.size) {
-        for (const [rubik, build] of map) {
-            if (set.has(rubik.position)) continue;
-            if ((() => {
-                for (const { rubik: { position } } of rubik.similarlyNoCongruent(n, i))
-                    if (set.has(position)) return false;
-                return true;
-            })()) yield { rubik, build };
-            for (const { rubik: { position } } of rubik.congruent(n, i))
-                set.add(position);
-            eT.filter((n) => !build.length || ~~((build.at(-1) - n) / 3)).forEach((n) => _map.set(
-                rubik.action(Turns[n]).readonly(),
-                [...build, n],
-            ));
-            eT.filter((n) => !build.length || ~~((build.at(0) - n) / 3)).forEach((n) => _map.set(
-                Turns[n].action(rubik).readonly(),
-                [n, ...build],
-            ));
-        }
-        map = _map, _map = new Map(), l++;
+export function solve(rubik: Rubik.Rubik) {
+    const { map, build } = data;
+    for (const { rubik: { position }, image, inverse, base, coordinate } of Rubik.similarly(rubik, 15)) {
+        if (!(position in build)) continue;
+        const solve = Build.from(build[position].map((v) => Position[map[v]]));
+        if (!inverse) solve.inverse();
+        if (image) solve.image();
+        return solve.base(((c) => image ? c.image() : c)(inverse ? base.inverse() : coordinate)[0]);
     }
-}
-export namespace Solver {
-    export declare let data: typeof import('./solvedata.json').default;
-    export function solveRaw(rubik: Rubik) {
-        for (const { rubik: { position }, image, inverse, base, coordinate } of rubik.similarly()) {
-            if (!(position in data)) continue;
-            const solve = new Build(data[position]);
-            if (!inverse) solve.inverse();
-            if (image) solve.image();
-            return solve.base(((c) => image ? c.image() : c)(inverse ? base.inverse() : coordinate)[0]);
-        }
-        return false;
-    };
-    Rubik.prototype.solve = function solve(t = NaN) {
-        const solve = solveRaw(this);
-        if (!solve) return false;
-        if (isNumber(t)) solve.bits(t);
-        return solve.stringify();
-    };
-    export function solve(scr: string, t = NaN) {
-        const rubik = new Rubik(0).do(scr);
-        if (!rubik) return false;
-        return rubik.solve(t);
-    }
-    export function* solveAll(scr: string, reverse = false) {
-        const rubik = new Rubik(0).do(scr);
-        if (!rubik) return false;
-        const solve = solveRaw(rubik);
-        if (!solve) return false;
-        const max = 1 << solve.length;
-        for (let t = 0; t < max; t++)
-            yield solve.bits(reverse ? ~t : t).stringify();
-    }
-}
+    return false;
+};

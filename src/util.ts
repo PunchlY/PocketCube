@@ -1,6 +1,6 @@
 
-const i8 = [...Array(8).keys()];
-const noop7 = Array.from<number>({ length: 7 });
+const i8 = Object.freeze([...Array(8).keys()]);
+const noop7 = Object.freeze(Array.from<number>({ length: 7 }));
 
 type Li = [number, number, number, number, number, number, number, number];
 
@@ -8,7 +8,7 @@ class Rubik {
     private declare C: Li;
     private declare T: Li;
     static from(position: number) {
-        const rubik = new this();
+        const rubik = new Rubik();
         rubik.position = position;
         return rubik;
     }
@@ -17,7 +17,7 @@ class Rubik {
         this.T = T;
         return this;
     }
-    private _position: number;
+    private _position?: number;
     private setPosition(position: number) {
         const _position = position = (position & 2147483647) % 88179840;
         if (!position) {
@@ -111,7 +111,7 @@ const [X, Y, Z] = [
     [14, 18, 8],
     [6, 9, 3],
     [4, 15, 13],
-].map((a) => a.map((n) => Base[n]));
+].map((a) => a.map((n) => Base[n]) as [Rubik, Rubik, Rubik]);
 const [R, U, F, L, D, B] = [
     [77350359, 68566824, 50861415],
     [51438240, 84505680, 33067440],
@@ -119,7 +119,7 @@ const [R, U, F, L, D, B] = [
     [15944780, 20238498, 22807586],
     [37179, 164025, 126846],
     [4540624, 5469687, 929887],
-].map((T) => T.map(Rubik.from));
+].map((T) => T.map(Rubik.from) as [Rubik, Rubik, Rubik]);
 
 function fix(rubik: Rubik, base: number) {
     return Base[base].copy().action(rubik, BaseT[base]);
@@ -155,51 +155,38 @@ function* similarly(rawRubik: Rubik, n: number, p?: number, c?: number) {
     }
 }
 
-const Turns = i8.map((i) => [R, U, F, L, D, B].filter((T) => T[0].at(i) === i * 3));
-const Is = new Map([R, U, F, L, D, B].map((turns) => turns.map((turn) => [turn, new Set(turns)] as const)).flat(1));
-
-function* Solver(p: number, half?: boolean, length = Infinity) {
-    const set = new Set<number>();
-    let map = new Map([[Base[0], [] as Rubik[]]]), tmp: typeof map = new Map();
-    do {
-        for (const [rubik, build] of map) {
-            if (hasNotSimilarly())
-                yield { rubik, build };
-            for (const { position } of congruent(rubik, p))
-                set.add(position);
-            for (const [turn, , turnT] of Turns[p])
-                push(turn), push(turnT);
-            if (!half) continue;
-            for (const [, turn2] of Turns[p])
-                push(turn2);
-
-            function hasNotSimilarly() {
-                for (const { position } of similarly(rubik, 14, p))
-                    if (set.has(position)) return false;
-                return true;
-            }
-            function push(turn: Rubik) {
-                const is = Is.get(turn);
-                if (!is.has(build.at(0))) {
-                    const before = turn.copy().action(rubik);
-                    if (!set.has(before.position))
-                        tmp.set(before, [turn, ...build]);
-                }
-                if (!is.has(build.at(-1))) {
-                    const after = rubik.copy().action(turn);
-                    if (!set.has(after.position))
-                        tmp.set(after, [...build, turn]);
-                }
-            }
-        }
-        map = tmp, tmp = new Map();
-    } while (length-- && map.size);
+const Turns = [
+    ...R, ...U, ...F,
+    ...L, ...D, ...B,
+    ...X, ...Y, ...Z,
+];
+enum TurnNames {
+    'R', 'R2', 'R\'',
+    'U', 'U2', 'U\'',
+    'F', 'F2', 'F\'',
+    'L', 'L2', 'L\'',
+    'D', 'D2', 'D\'',
+    'B', 'B2', 'B\'',
+    'X', 'X2', 'X\'',
+    'Y', 'Y2', 'Y\'',
+    'Z', 'Z2', 'Z\'',
 }
 
+function* StringToTrunsIndex(str: string) {
+    for (const [name] of String.prototype.matchAll.call(str, /[RUFLDBXYZ]['2]?/g))
+        yield TurnNames[name as any] as unknown as number;
+}
+function* StringToTruns(str: string) {
+    for (const index of StringToTrunsIndex(str))
+        yield Turns[index];
+}
+
+export { i8 };
 export { Rubik };
 export { fix };
 export { congruent, similarly };
-export { Solver };
+
+export { Turns, TurnNames, StringToTrunsIndex, StringToTruns };
 
 export { Base, BaseT };
 export { X, Y, Z, R, U, F, L, D, B };

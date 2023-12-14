@@ -8,17 +8,14 @@ function ntoa(n: number) {
     })(n)].map((n) => chs[n]).join('');
 }
 
-export default function (data: typeof import('solvedata.json').default) {
+export default function (data: typeof import('solvedata.json')) {
     const { map, build: builds } = data;
     const mapL = map.length + 1;
     delete builds[0];
     const a: string[][] = [];
     for (let position in builds) {
         const build = builds[position];
-        const sBuild = ntoa(
-            build
-                .reduceRight((p, c) => p * mapL + c + 1, 0)
-        );
+        const sBuild = ntoa(build.reduceRight((p, c) => p * mapL + c + 1, 0));
         const sPosition = ntoa(Number(position));
         (a[sPosition.length - 1 + (sBuild.length - 1) * mlength] ??= []).push(`${sPosition}${sBuild}`);
     }

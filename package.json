@@ -20,5 +20,9 @@
     "cube",
     "solve",
     "matrix"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "vite": "^5.0.9"
+  }
 }

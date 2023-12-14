@@ -99,6 +99,9 @@ class Build {
         });
         return this;
     }
+    valueOf() {
+        return this.#data;
+    }
     toString() {
         return this.#data.map((v) => TurnNames[v]).join('');
     }

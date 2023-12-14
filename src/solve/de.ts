@@ -1,4 +1,5 @@
 import { chs, mlength } from './const.js';
+import solvedata from 'solvedata.min.json';
 
 const { length } = chs;
 const tab = Object.fromEntries([...chs].map((v, i) => [v, i]));
@@ -11,10 +12,10 @@ function* dsplit(s: string, x: number, y: number) {
         yield [s.slice(i, i + x), s.slice(i + x, i + x + y)];
 };
 
-export default function (map: string[], sBuild: string, n: [number, number][]) {
+function de({ map, sBuild, pos }: typeof import('solvedata.min.json')) {
     const mapL = map.length + 1;
     const data = Object.fromEntries(function* () {
-        for (const [length, i] of n) {
+        for (const [length, i] of pos) {
             const kl = (i % mlength) + 1, vl = ~~(i / mlength) + 1, dl = kl + vl, l = length * dl;
             for (const [k, v] of dsplit(sBuild.slice(0, l), kl, vl))
                 yield [aton(k), vfn(v)];
@@ -33,3 +34,5 @@ export default function (map: string[], sBuild: string, n: [number, number][]) {
         })(aton(v))];
     }
 }
+
+export const { map, build } = de(solvedata);

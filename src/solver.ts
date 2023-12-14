@@ -1,6 +1,7 @@
-import { i8, Rubik, R, U, F, L, D, B, Base, congruent, similarly } from './util.js';
+import { Rubik } from './base.js';
+import { R, U, F, L, D, B, congruent, similarly } from './util.js';
 
-const Turns = i8.map((i) => [R, U, F, L, D, B].filter((T) => T[0].at(i) === i * 3));
+const Turns = Array.from({ length: 8 }, (_, i) => [R, U, F, L, D, B].filter((T) => T[0].at(i) === i * 3));
 
 function SameLayer(turn: Rubik, layer: [Rubik, Rubik, Rubik]) {
     for (const rubik of layer)

@@ -1,4 +1,5 @@
 import { chs, mlength } from './const.js';
+import solvedata from 'solvedata.json';
 
 const { length } = chs;
 
@@ -8,7 +9,7 @@ function ntoa(n: number) {
     })(n)].map((n) => chs[n]).join('');
 }
 
-export default function (data: typeof import('solvedata.json')) {
+function en(data: typeof import('solvedata.json')) {
     const { map, build: builds } = data;
     const mapL = map.length + 1;
     delete builds[0];
@@ -19,14 +20,16 @@ export default function (data: typeof import('solvedata.json')) {
         const sPosition = ntoa(Number(position));
         (a[sPosition.length - 1 + (sBuild.length - 1) * mlength] ??= []).push(`${sPosition}${sBuild}`);
     }
-    const p: number[][] = [];
-    return [
-        map.map(ntoa),
-        a.map((s, i) => {
+    const pos: number[][] = [];
+    return {
+        map: map.map(ntoa),
+        sBuild: a.map((s, i) => {
             if (!s.length) return '';
-            p.push([s.length, i]);
+            pos.push([s.length, i]);
             return s.join('');
         }).join(''),
-        p,
-    ] as const;
+        pos,
+    };
 };
+
+export default en(solvedata);

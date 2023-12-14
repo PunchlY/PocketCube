@@ -1,7 +1,8 @@
-import { Rubik as BaseRubik, similarly, TurnNames, StringToTruns } from './util.js';
+import { similarly, TurnNames, StringToTruns } from './util.js';
+import { Rubik as BaseRubik } from './base.js';
 import { Build, Position } from './build.js';
 
-let data: typeof import('solvedata.json') = import.meta.env?.RUBIKSOLVEDATA;
+let data: typeof import('solvedata.json') = import.meta.env?.SOLVEDATA;
 
 function solve(rubik: BaseRubik) {
     const { map, build } = data;
@@ -83,5 +84,4 @@ class Rubik {
     }
 }
 
-export { Rubik };
-export default Rubik;
+export { Rubik, Rubik as default };

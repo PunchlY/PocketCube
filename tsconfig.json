@@ -15,5 +15,12 @@
         "experimentalDecorators": true,
         "noImplicitOverride": true,
         "outDir": "./build",
+        "baseUrl": ".",
+        "rootDir": ".",
+        "paths": {
+            "solvedata.json": [
+                "./solvedata.json",
+            ],
+        }
     }
 }

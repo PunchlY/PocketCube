@@ -14,7 +14,7 @@ import { Rubik } from 'pocketcube';
 const rubik = new Rubik(0);
 rubik.action(Rubik.R[0]);
 rubik.action(Rubik.U[2], Rubik.Rubik.B[1]);
-rubik.do(`RF2U'`);
+rubik.action(`RF2U'`);
 ```
 
 解魔方:
@@ -23,11 +23,11 @@ rubik.do(`RF2U'`);
 import { Rubik } from 'pocketcube/dist/PocketCube.solve.min.mjs';
 
 const rubik = new Rubik();
-rubik.do(`RF2U'B2LBD2L'`);
+rubik.action(`RF2U'B2LBD2L'`);
 rubik.solve(); // ULUL'F'U2F2L2
 rubik.solve(0); // URFU'R'F2R2U2
 
-new Rubik().do(`D2RF'U2B'`).solve(0); // FR2FU'F2
+new Rubik().action(`D2RF'U2B'`).solve(0); // FR2FU'F2
 ```
 ## 准备
 
@@ -261,20 +261,11 @@ $$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},
 
 ```js
 const rubik = new Rubik();
-rubik.action(Rubik.R[0]);
-rubik.action(Rubik.U[2], Rubik.B[1]);
-rubik.action(new Rubik(123));
+rubik.action('R');
+rubik.action('U2', 'B');
+rubik.action('RU\'RF2R\'UR\'');
+rubik.action(new Rubik(123), 'RU\'RF2R\'UR\'','U2');
 rubik.action(new Rubik().action(Rubik.R[0]));
-```
-
-#### Rubik.prototype.do(str)
-
-公式旋转.
-
-```js
-const rubik = new Rubik();
-rubik.do(`RF2U'`);
-rubik.do(`R'`).do(`F2'`);
 ```
 
 #### Rubik.prototype.isReinstated()
@@ -282,8 +273,8 @@ rubik.do(`R'`).do(`F2'`);
 检测是否复原.
 
 ```js
-new Rubik().do(`R'`).isReinstated(); // false
-new Rubik().do(Rubik.C[10]).isReinstated(); // true
+new Rubik().action('R').isReinstated(); // false
+new Rubik().action('XY2').isReinstated(); // true
 ```
 
 #### Rubik.prototype.at(i)
@@ -321,11 +312,11 @@ $$\begin{Bmatrix}C_iSC_j\end{Bmatrix}$$
 
 ```js
 import { Rubik } from 'pocketcube/dist/PocketCube.solve.min.mjs';
-new Rubik().do(`R'`).solve(); // R
-new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(); // F'LDF'D2FDL2F
-new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0); // F'RFU'F2UFR2U'
-new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(-1); // B'DBD'L2DBD2L'
-new Rubik().do(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F'
+new Rubik().action(`R'`).solve(); // R
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(); // F'LDF'D2FDL2F
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0); // F'RFU'F2UFR2U'
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(-1); // B'DBD'L2DBD2L'
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F'
 ```
 
 `t`默认为`NaN`.

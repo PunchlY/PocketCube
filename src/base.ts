@@ -8,11 +8,21 @@ function MOD(x: number, mod: number) {
     return mod - ((mod - (x % mod)) % mod);
 }
 
+const FrozenCopy = function (target: any, propertyKey, descriptor) {
+    const fn = target[propertyKey];
+    if (typeof fn === 'function') return {
+        ...descriptor,
+        value(this: Rubik) {
+            return Reflect.apply(fn, Object.isFrozen(this) ? this.copy() : this, arguments);
+        },
+    };
+} as MethodDecorator;
+
 class Rubik {
-    private declare C: Li;
-    private declare T: Li;
+    declare C: Li;
+    declare T: Li;
     static from(position: number) {
-        const rubik = new Rubik();
+        const rubik = new this();
         rubik.position = position;
         return rubik;
     }
@@ -64,7 +74,8 @@ class Rubik {
         return p * 3 + (3 + (n % 3) - this.T[p]) % 3;
     }
 
-    action(...rubiks: Rubik[]) {
+    @FrozenCopy
+    action(...rubiks: (Rubik | Readonly<Rubik>)[]) {
         for (const { C: rC, T: rT } of rubiks) {
             const { C: tC, T: tT } = this.copy();
             rC.forEach((n, i) => {
@@ -75,6 +86,7 @@ class Rubik {
         delete this._position;
         return this;
     }
+    @FrozenCopy
     inverse() {
         const { C: tC, T: tT } = this.copy();
         tC.forEach((n, i) => {
@@ -84,6 +96,7 @@ class Rubik {
         delete this._position;
         return this;
     }
+    @FrozenCopy
     image() {
         const { C: tC, T: tT } = this.copy();
         [1, 0, 3, 2, 5, 4, 7, 6].forEach((n, i, a) => {

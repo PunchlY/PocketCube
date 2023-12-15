@@ -1,7 +1,7 @@
 
 declare module 'solvedata.json' {
-    export const map: number[];
-    export const build: Record<number, number[]>;
+    export const map: readonly number[];
+    export const build: Readonly<Record<number,readonly number[]>>;
 }
 
 declare module 'solvedata.min.json' {

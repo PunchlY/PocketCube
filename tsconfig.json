@@ -19,6 +19,7 @@
         "rootDir": ".",
         "paths": {
             "solvedata.json": [
+                "./src/solve/de.json",
                 "./solvedata.json",
             ],
         }

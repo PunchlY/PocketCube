@@ -1,9 +1,9 @@
 import { Rubik } from './base.js';
-import { R, U, F, L, D, B, congruent, similarly } from './util.js';
+import { R, U, F, L, D, B, congruent, similarly, type Trun, type Layer } from './util.js';
 
 const Turns = Array.from({ length: 8 }, (_, i) => [R, U, F, L, D, B].filter((T) => T[0].at(i) === i * 3));
 
-function SameLayer(turn: Rubik, layer: [Rubik, Rubik, Rubik]) {
+function SameLayer(turn: Trun, layer: Layer) {
     for (const rubik of layer)
         if (turn === rubik) return true;
     return false;
@@ -11,13 +11,13 @@ function SameLayer(turn: Rubik, layer: [Rubik, Rubik, Rubik]) {
 
 function Solver(p: number, half?: boolean, length = Infinity) {
     return {
-        turns: Turns[p].flat(1).map(({ position }) => position),
+        turns: Turns[p].flat(1),
         res: Solver(),
     };
 
     function* Solver() {
         const set = new Set<number>();
-        let map = new Map([[0, [] as Rubik[]]]), tmp: typeof map = new Map();
+        let map = new Map([[0, [] as Trun[]]]), tmp: typeof map = new Map();
         do {
             for (const [position, build] of map) {
                 const rubik = Rubik.from(position);
@@ -36,14 +36,14 @@ function Solver(p: number, half?: boolean, length = Infinity) {
                         if (set.has(position)) return false;
                     return true;
                 }
-                function push(turn: Rubik, layer: [Rubik, Rubik, Rubik]) {
+                function push(turn: Trun, layer: Layer) {
                     if (!SameLayer(build.at(-1)!, layer)) {
                         const { position } = rubik.copy().action(turn);
                         if (!set.has(position))
                             tmp.set(position, [...build, turn]);
                     }
                     if (!SameLayer(build.at(0)!, layer)) {
-                        const { position } = turn.copy().action(rubik);
+                        const { position } = turn.action(rubik);
                         if (!set.has(position))
                             tmp.set(position, [turn, ...build]);
                     }

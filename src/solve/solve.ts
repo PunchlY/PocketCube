@@ -1,12 +1,14 @@
 import { Solver } from '../solver.js';
-import { Rubik, Turns, similarly } from '../util.js';
+import { Rubik } from '../base.js';
+import { Turns, similarly } from '../util.js';
 import { Build, Position } from '../build.js';
 import fs from 'fs/promises';
 
 const builds: Record<number, number[]> = {};
 const { turns, res } = Solver(7, true);
-const posToIndex = new Map(turns.map((v, i) => [v, i] as const));
-const buildToIndex = Turns.map(({ position }) => turns.indexOf(position));
+const map = turns.map(({ position }) => position);
+const posToIndex = new Map(map.map((v, i) => [v, i] as const));
+const buildToIndex = Turns.map(({ position }) => map.indexOf(position));
 for (const { build, position } of res) {
     const rubik = Rubik.from(position);
     const { position: index, image, inverse, base } = [...function* () {
@@ -25,7 +27,7 @@ for (const { build, position } of res) {
 }
 
 const data: typeof import('solvedata.json') = {
-    map: turns,
+    map,
     build: builds,
 };
 

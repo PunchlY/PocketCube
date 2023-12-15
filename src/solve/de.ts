@@ -12,21 +12,21 @@ function* dsplit(s: string, x: number, y: number) {
         yield [s.slice(i, i + x), s.slice(i + x, i + x + y)];
 };
 
-function de({ map, sBuild, pos }: typeof import('solvedata.min.json')) {
+function de({ map, sBuild, pos }: typeof import('solvedata.min.json')): typeof import('solvedata.json') {
     const mapL = map.length + 1;
     const data = Object.fromEntries(function* () {
         for (const [length, i] of pos) {
             const kl = (i % mlength) + 1, vl = ~~(i / mlength) + 1, dl = kl + vl, l = length * dl;
             for (const [k, v] of dsplit(sBuild.slice(0, l), kl, vl))
-                yield [aton(k), vfn(v)];
+                yield [aton(k), Object.freeze(vfn(v))];
             sBuild = sBuild.slice(l);
         }
     }());
     data[0] = [];
-    return Object.freeze({
+    return {
         map: Object.freeze(map.map(aton)),
         build: Object.freeze(data)
-    });
+    };
 
     function vfn(v: string) {
         return [...(function* (n) {

@@ -1,23 +1,22 @@
-import { similarly, TurnNames, StringToTruns } from './util.js';
+import { similarly, TurnNames, Base, StringToTruns, congruent } from './util.js';
 import { Rubik as BaseRubik } from './base.js';
 import { Build, Position } from './build.js';
-
-let data: typeof import('solvedata.json') = import.meta.env?.SOLVEDATA;
+import solvedata from 'solvedata.json';
 
 function solve(rubik: BaseRubik) {
-    const { map, build } = data;
+    const { map, build } = solvedata;
     for (let { rubik: { position }, image, inverse, base, coordinate } of similarly(rubik, 15)) {
         if (!(position in build)) continue;
         const solve = Build.from(build[position].map((v) => Position[map[v]]));
         if (inverse) {
-            base.inverse();
+            base = base.inverse();
         } else {
             solve.inverse();
             base = coordinate;
         }
         if (image) {
             solve.image();
-            base.image();
+            base = base.image();
         }
         return solve.base(base.at(0));
     }
@@ -44,6 +43,38 @@ class Rubik {
         const data = this.#data ??= BaseRubik.from(0);
         return data.position;
     }
+    isReinstated() {
+        const { C, T } = Base[this.#data?.at(0)!];
+        for (const i of C.keys()) if (
+            this.#data?.C[i] !== C[i] ||
+            this.#data?.T[i] !== T[i]
+        ) return false;
+        return true;
+    }
+    *similarly(n: number, p?: number, c?: number) {
+        for (const { rubik: baseRubik, image, inverse, base, coordinate } of similarly(this.#data ??= BaseRubik.from(0), n, p, c)) {
+            const rubik = new Rubik();
+            rubik.#data = baseRubik;
+            yield {
+                rubik,
+                image,
+                inverse,
+                base: base.at(0),
+                coordinate: coordinate.at(0),
+            };
+        }
+    }
+    *congruent(p?: number, c?: number) {
+        for (const { rubik: baseRubik, base, coordinate } of congruent(this.#data ??= BaseRubik.from(0), p, c)) {
+            const rubik = new Rubik();
+            rubik.#data = baseRubik;
+            yield {
+                rubik,
+                base: base.at(0),
+                coordinate: coordinate.at(0),
+            };
+        }
+    }
     copy() {
         const rubik = new Rubik();
         rubik.#data = this.#data?.copy();
@@ -60,27 +91,26 @@ class Rubik {
     action(...rubiks: (Rubik | typeof TurnNames[number])[]): this;
     action(...rubiks: (Rubik | string)[]): this;
     action(...rubiks: (Rubik | string)[]) {
-        if (Object.isFrozen(this)) throw -1;
         const data = this.#data ??= BaseRubik.from(0);
         Reflect.apply(BaseRubik.prototype.action, data, [...Rubik.#toBaseRubik(rubiks)]);
         return this;
     }
     inverse() {
-        if (Object.isFrozen(this)) throw -1;
         const data = this.#data ??= BaseRubik.from(0);
         data.inverse();
         return this;
     }
     image() {
-        if (Object.isFrozen(this)) throw -1;
         const data = this.#data ??= BaseRubik.from(0);
         data.image();
         return this;
     }
-    solve() {
+    solve(bit?: number) {
         if (!this.#data) return '';
         const build = solve(this.#data);
-        return build && build.toString();
+        if (!build) throw -2;
+        if (arguments.length) build.bits(bit!);
+        return build.toString();
     }
 }
 

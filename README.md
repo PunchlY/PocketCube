@@ -20,7 +20,7 @@ rubik.action(`RF2U'`);
 解魔方:
 
 ```js
-import { Rubik } from 'pocketcube/dist/PocketCube.solve.min.mjs';
+import { Rubik } from 'pocketcube';
 
 const rubik = new Rubik();
 rubik.action(`RF2U'B2LBD2L'`);
@@ -223,17 +223,21 @@ $$\exists C_i,C_j\in\mathbf{C},P=C_iQC_j$$
 
 `P` `Q`若满足以下:
 
-$$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},\overline{P^{-1}}\end{Bmatrix},R=C_iQC_j$$
+$$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},\overline{P}^{-1}\end{Bmatrix},R=C_iQC_j$$
 
 则表示`P`相似于`Q`.
 
-## api
+## API
 
 ### Rubik
 
-#### new Rubik(position)
+#### new Rubik()
 
 初始化一个魔方.
+
+#### Rubik.from(position)
+
+使用`position`创建一个`Rubik`.
 
 `position`是`Rubik`实例的状态值.
 
@@ -261,10 +265,10 @@ $$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},
 
 ```js
 const rubik = new Rubik();
-rubik.action('R');
-rubik.action('U2', 'B');
-rubik.action('RU\'RF2R\'UR\'');
-rubik.action(new Rubik(123), 'RU\'RF2R\'UR\'','U2');
+rubik.action(`R`);
+rubik.action(`U2`, `B`);
+rubik.action(`RU'RF2R'UR'`);
+rubik.action(new Rubik(123), `RU'RF2R'UR'`,`U2`);
 rubik.action(new Rubik().action(Rubik.R[0]));
 ```
 
@@ -273,8 +277,9 @@ rubik.action(new Rubik().action(Rubik.R[0]));
 检测是否复原.
 
 ```js
-new Rubik().action('R').isReinstated(); // false
-new Rubik().action('XY2').isReinstated(); // true
+new Rubik().action(`R`).isReinstated(); // false
+new Rubik().action(`R`).action(`R'`).isReinstated(); // true
+new Rubik().action(`XY2`).isReinstated(); // true
 ```
 
 #### Rubik.prototype.at(i)
@@ -285,22 +290,24 @@ new Rubik().action('XY2').isReinstated(); // true
 C[i] * 3 + T[i];
 ```
 
-#### Rubik.prototype.similar(n, i)
+#### Rubik.prototype.similarly(n, p, c)
 
 返回值为一个`Generator`, 生成相似于当前状态(`S`)的状态.
 
-$$\begin{Bmatrix}C_iTC_j\ |\ T\in\begin{Bmatrix}S,S^{-1},\overline{S},\overline{S^{-1}}\end{Bmatrix}\end{Bmatrix}$$
+$$\begin{Bmatrix}C_iTC_j\ |\ T\in\begin{Bmatrix}S,S^{-1},\overline{S},{\overline{S}}^{-1}\end{Bmatrix}\end{Bmatrix}$$
 
 ```js
 const rubik = new Rubik(/* ... */);
-for (const { r, c: [c, cT], image, inverse } of rubik.similar(0)) {
+for (const { rubik: _rubik, image, inverse, base, coordinate } of rubik.similar(15)) {
     // ...
 }
 ```
 
-若设置`n` `i`, 则只输出位置`i`上值为`n`的状态, `i`默认为`0`.
+`n`: `congruent=1; image=2; inverse=4; image&inverse=8;`
 
-#### Rubik.prototype.congruent(n, i)
+若`p`不为空, 则只输出位置`p`上值为`c`的状态, `c`默认为`0`.
+
+#### Rubik.prototype.congruent(p, c)
 
 返回值为一个`Generator`, 生成全等于当前状态(`S`)的状态.
 
@@ -311,49 +318,14 @@ $$\begin{Bmatrix}C_iSC_j\end{Bmatrix}$$
 解魔方.
 
 ```js
-import { Rubik } from 'pocketcube/dist/PocketCube.solve.min.mjs';
 new Rubik().action(`R'`).solve(); // R
-new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(); // F'LDF'D2FDL2F
-new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0); // F'RFU'F2UFR2U'
-new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(-1); // B'DBD'L2DBD2L'
-new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // U'LDF'L2FRU2F'
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(); // R'B2R'U2BR'B2R'B2
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0); // R'F2R'F2UF'U2F'R2
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(-1); // L'D2L'D2BD'L2D'B2
+new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // R'B2L'F2DF'U2F'U2
 ```
 
-`t`默认为`NaN`.
-
 `t`为整数时, 按位以`0`: [`R` `U` `F`], `1`: [`L` `D` `B`], 分配公式字母.
-
-#### Rubik.C
-为`Rubik`实例的长度为`24`的数组, 其元素定义为魔方在空间中不同位置(朝向)的状态.
-
-#### Rubik.R
-为`Rubik`实例的数组, 其元素分别定义为`"R"`旋转, `"R2"`旋转, `"R'"`旋转.
-
-本质为`Rubik.C[0]`执行`"R"`(`"R2"`, `"R'"`)旋转后的状态.
-
-#### Rubik.U
-类似[Rubik.R](#turnr)
-
-#### Rubik.F
-类似[Rubik.R](#turnr)
-
-#### Rubik.L
-类似[Rubik.R](#turnr)
-
-#### Rubik.D
-类似[Rubik.R](#turnr)
-
-#### Rubik.B
-类似[Rubik.R](#turnr)
-
-#### Rubik.X
-类似[Rubik.R](#turnr)
-
-#### Rubik.Y
-类似[Rubik.R](#turnr)
-
-#### Rubik.Z
-类似[Rubik.R](#turnr)
 
 ## License
 

@@ -24,7 +24,7 @@ import { Rubik } from 'pocketcube';
 
 const rubik = new Rubik();
 rubik.action(`RF2U'B2LBD2L'`);
-rubik.solve(); // ULUL'F'U2F2L2
+rubik.solve(); // DFDR'F'R2F2D2
 rubik.solve(0); // URFU'R'F2R2U2
 
 new Rubik().action(`D2RF'U2B'`).solve(0); // FR2FU'F2

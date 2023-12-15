@@ -1,3 +1,3 @@
 import { Rubik } from './src/rubik.js';
 
-console.log(new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0));
+console.log(new Rubik().action(`RF2U'B2LBD2L'`).solve(0));

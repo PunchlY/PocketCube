@@ -108,7 +108,7 @@ class Rubik {
     solve(bit?: number) {
         if (!this.#data) return '';
         const build = solve(this.#data);
-        if (!build) throw -2;
+        if (!build) return false;
         if (arguments.length) build.bits(bit!);
         return build.toString();
     }

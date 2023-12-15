@@ -39,7 +39,7 @@ function fix(rubik: Rubik, base: number) {
 function* _congruent(rawRubik: Rubik, set: Set<number>, p?: number, c?: number) {
     for (const base of Base) {
         const baseRubik = Object.freeze(base.action(rawRubik));
-        for (const coordinate of p === null || typeof p === 'undefined' ? Base : [_Base[p][baseRubik.find(c ?? p * 3)]]) {
+        for (const coordinate of p === null || p === undefined ? Base : [_Base[p][baseRubik.find(c ?? p * 3)]]) {
             const rubik = baseRubik.action(coordinate);
             const pos = rubik.position;
             if (set.has(pos)) continue;

@@ -20,6 +20,8 @@ function Solver(p: number, half?: boolean, length = Infinity) {
         let map = new Map([[0, [] as Trun[]]]), tmp: typeof map = new Map();
         do {
             for (const [position, build] of map) {
+                if (set.has(position))
+                    continue;
                 const rubik = Rubik.from(position);
                 if (hasNotSimilarly())
                     yield { position, build };

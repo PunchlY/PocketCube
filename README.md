@@ -223,7 +223,7 @@ $$\exists C_i,C_j\in\mathbf{C},P=C_iQC_j$$
 
 `P` `Q`若满足以下:
 
-$$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},\overline{P}^{-1}\end{Bmatrix},R=C_iQC_j$$
+$$\exists C_i,C_j\in\mathbf{C},\exists R\in\begin{Bmatrix}P,P^{-1},\overline{P},\overline{P^{-1}}\end{Bmatrix},R=C_iQC_j$$
 
 则表示`P`相似于`Q`.
 
@@ -294,7 +294,7 @@ C[i] * 3 + T[i];
 
 返回值为一个`Generator`, 生成相似于当前状态(`S`)的状态.
 
-$$\begin{Bmatrix}C_iTC_j\ |\ T\in\begin{Bmatrix}S,S^{-1},\overline{S},{\overline{S}}^{-1}\end{Bmatrix}\end{Bmatrix}$$
+$$\begin{Bmatrix}C_iTC_j\ |\ T\in\begin{Bmatrix}S,S^{-1},\overline{S},{\overline{S^{-1}}}\end{Bmatrix}\end{Bmatrix}$$
 
 ```js
 const rubik = new Rubik(/* ... */);
@@ -326,21 +326,3 @@ new Rubik().action(`FU'BU'RU'F2DR'BRU'L'UR2`).solve(0b00000010110); // R'B2L'F2D
 ```
 
 `t`为整数时, 按位以`0`: [`R` `U` `F`], `1`: [`L` `D` `B`], 分配公式字母.
-
-## License
-
-```
-        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-                    Version 2, December 2004
-
- Copyright (C) 2004 PunchlY <punchly@foxmail.com>
-
- Everyone is permitted to copy and distribute verbatim or modified
- copies of this license document, and changing it is allowed as long
- as the name is changed.
-
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
-  1. You just DO WHAT THE FUCK YOU WANT TO.
-```

@@ -9,4 +9,3 @@ export const chs = Reflect.apply(String.fromCharCode, String, [
     123, 124, 125, 126,
 ]);
 export const mlength = Math.ceil(Math.log(88179840) / Math.log(chs.length));
-

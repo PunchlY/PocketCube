@@ -26,7 +26,7 @@ for (const { build, position } of res) {
     builds[index] = solve.valueOf().map((v) => buildToIndex[v]);
 }
 
-const data: typeof import('solvedata.json') = {
+const data = {
     map,
     build: builds,
 };

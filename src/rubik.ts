@@ -6,7 +6,9 @@ import solvedata from 'solvedata.json';
 function solve(rubik: BaseRubik) {
     const { map, build } = solvedata;
     for (let { rubik: { position }, image, inverse, base, coordinate } of similarly(rubik, 15)) {
-        if (!(position in build)) continue;
+        if (!(position in build))
+            continue;
+        // @ts-ignore
         const solve = Build.from(build[position].map((v) => Position[map[v]]));
         if (inverse) {
             base = base.inverse();

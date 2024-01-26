@@ -1,6 +1,6 @@
 {
   "name": "pocketcube",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "type": "module",
   "description": "一个解二阶魔方的api(An api for Pocket Cube).",
   "main": "./dist/index.js",

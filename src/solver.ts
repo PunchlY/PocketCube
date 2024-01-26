@@ -22,7 +22,7 @@ function Solver(p: number, half?: boolean, length = Infinity) {
             for (const [position, build] of map) {
                 if (set.has(position))
                     continue;
-                const rubik = Rubik.from(position);
+                const rubik = Object.freeze(Rubik.from(position));
                 if (hasNotSimilarly())
                     yield { position, build };
                 for (const { position } of congruent(rubik, p))
@@ -40,7 +40,7 @@ function Solver(p: number, half?: boolean, length = Infinity) {
                 }
                 function push(turn: Trun, layer: Layer) {
                     if (!SameLayer(build.at(-1)!, layer)) {
-                        const { position } = rubik.copy().action(turn);
+                        const { position } = rubik.action(turn);
                         if (!set.has(position))
                             tmp.set(position, [...build, turn]);
                     }

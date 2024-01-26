@@ -36,7 +36,7 @@ function fix(rubik: Rubik, base: number) {
     return Base[base].action(rubik, BaseT[base]);
 }
 
-function* _congruent(rawRubik: Rubik, set: Set<number>, p?: number, c?: number) {
+function* _congruent(rawRubik: Rubik | Readonly<Rubik>, set: Set<number>, p?: number, c?: number) {
     for (const base of Base) {
         const baseRubik = Object.freeze(base.action(rawRubik));
         for (const coordinate of p === null || p === undefined ? Base : [_Base[p][baseRubik.find(c ?? p * 3)]]) {
@@ -48,10 +48,10 @@ function* _congruent(rawRubik: Rubik, set: Set<number>, p?: number, c?: number) 
         }
     }
 }
-function* congruent(rawRubik: Rubik, p?: number, c?: number) {
+function* congruent(rawRubik: Rubik | Readonly<Rubik>, p?: number, c?: number) {
     yield* _congruent(rawRubik, new Set(), p, c);
 }
-function* similarly(rawRubik: Rubik, n: number, p?: number, c?: number) {
+function* similarly(rawRubik: Rubik | Readonly<Rubik>, n: number, p?: number, c?: number) {
     const set = new Set<number>();
     for (const [t, rubik] of [
         (n & 1) && rawRubik,

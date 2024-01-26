@@ -1,0 +1,9 @@
+/solvedata.json
+/solvedata.min.json
+/src
+/src/*
+*.ts
+
+!/dist/*
+
+/tsconfig.json

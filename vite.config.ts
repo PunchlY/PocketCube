@@ -17,6 +17,7 @@ export default defineConfig({
     resolve: {
         alias: {
             'solvedata.json': './src/solve/de.ts',
+            'solvedata.min.json': './solvedata.min.json',
         },
     },
     plugins: [dts({ rollupTypes: true })],

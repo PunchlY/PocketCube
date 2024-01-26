@@ -1,5 +1,5 @@
 import { chs, mlength } from './const.js';
-import { map, sBuild, pos } from '../../solvedata.min.json';
+import { map, sBuild, pos } from 'solvedata.min.json';
 
 const { length } = chs;
 const tab = Object.fromEntries([...chs].map((v, i) => [v, i]));

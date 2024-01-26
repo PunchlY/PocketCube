@@ -26,14 +26,13 @@ function solve(rubik: BaseRubik) {
 }
 
 class Rubik {
-    #data?: BaseRubik;
+    #data = BaseRubik.from(0);
     static *#toBaseRubik(rubiks: (Rubik | string)[]) {
         for (const rubik of rubiks) {
-            if (rubik instanceof Rubik) {
+            if (rubik instanceof Rubik)
                 yield rubik.#data;
-                continue;
-            }
-            yield* StringToTruns(rubik);
+            else
+                yield* StringToTruns(rubik);
         }
     }
     static from(position: number) {
@@ -42,19 +41,18 @@ class Rubik {
         return rubik;
     }
     get position() {
-        const data = this.#data ??= BaseRubik.from(0);
-        return data.position;
+        return this.#data.position;
     }
     isReinstated() {
-        const { C, T } = Base[this.#data?.at(0)!];
+        const { C, T } = Base[this.#data.at(0)];
         for (const i of C.keys()) if (
-            this.#data?.C[i] !== C[i] ||
-            this.#data?.T[i] !== T[i]
+            this.#data.C[i] !== C[i] ||
+            this.#data.T[i] !== T[i]
         ) return false;
         return true;
     }
     *similarly(n: number, p?: number, c?: number) {
-        for (const { rubik: baseRubik, image, inverse, base, coordinate } of similarly(this.#data ??= BaseRubik.from(0), n, p, c)) {
+        for (const { rubik: baseRubik, image, inverse, base, coordinate } of similarly(this.#data, n, p, c)) {
             const rubik = new Rubik();
             rubik.#data = baseRubik;
             yield {
@@ -67,7 +65,7 @@ class Rubik {
         }
     }
     *congruent(p?: number, c?: number) {
-        for (const { rubik: baseRubik, base, coordinate } of congruent(this.#data ??= BaseRubik.from(0), p, c)) {
+        for (const { rubik: baseRubik, base, coordinate } of congruent(this.#data, p, c)) {
             const rubik = new Rubik();
             rubik.#data = baseRubik;
             yield {
@@ -79,36 +77,30 @@ class Rubik {
     }
     copy() {
         const rubik = new Rubik();
-        rubik.#data = this.#data?.copy();
+        rubik.#data = this.#data.copy();
         return rubik;
     }
     at(i: number) {
-        const data = this.#data ??= BaseRubik.from(0);
-        return data.at(i);
+        return this.#data.at(i);
     }
     find(n: number) {
-        const data = this.#data ??= BaseRubik.from(0);
-        return data.find(n);
+        return this.#data.find(n);
     }
-    action(...rubiks: (Rubik | typeof TurnNames[number])[]): this;
+    action(...rubiks: (Rubik | keyof typeof TurnNames)[]): this;
     action(...rubiks: (Rubik | string)[]): this;
     action(...rubiks: (Rubik | string)[]) {
-        const data = this.#data ??= BaseRubik.from(0);
-        Reflect.apply(BaseRubik.prototype.action, data, [...Rubik.#toBaseRubik(rubiks)]);
+        Reflect.apply(BaseRubik.prototype.action, this.#data, [...Rubik.#toBaseRubik(rubiks)]);
         return this;
     }
     inverse() {
-        const data = this.#data ??= BaseRubik.from(0);
-        data.inverse();
+        this.#data.inverse();
         return this;
     }
     image() {
-        const data = this.#data ??= BaseRubik.from(0);
-        data.image();
+        this.#data.image();
         return this;
     }
     solve(bit?: number) {
-        if (!this.#data) return '';
         const build = solve(this.#data);
         if (!build) return false;
         if (arguments.length) build.bits(bit!);
